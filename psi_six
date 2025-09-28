@@ -1,0 +1,109 @@
+
+"""
+Psi 6 is a method for calculating how close to perfectly hexagonal a crystal arrangment is 
+"""
+import numpy as np
+from scipy.spatial import cKDTree
+
+
+def read_data(filename):
+    coordinates=[]
+
+    with open(filename, "r") as f:
+        lines = f.readlines() # opens the output file and reads the each line as an item in a list of strings
+    
+    #extract the data for the positions 
+    atom_positions = lines[9:1009]
+    for atom in atom_positions:
+        data =atom.split()
+        x, y = float(data[2]), float(data[3])
+        coordinates.append([x,y])
+
+    return np.array(coordinates)
+
+
+
+
+def Number_near_neighbour (coordiantes, k=6):
+    """
+    works by taking a paricle and first the 6 closest neighbour
+    start from a small mod (R) and make it slowly bigger, have a tollarance and stop when you get 6 in a regestatly
+    """
+    N = len(coordiantes)
+
+    tree = cKDTree(coordiantes, boxsize=None)
+    #qyery the tree to find a list of distances for nearest neighbors 
+    #set workers=-1 is you do a batch job with more then one CPU, (-1 uses all available CPU's)
+    distances, indices = tree.query(coordiantes, k=k+1, workers=1)
+
+    #don't include the particle you are queiring, first element will be 0 for distance 
+    neighbors = indices[:, 1:]
+    distances = distances[:, 1:]
+    
+    return neighbors, distances
+
+def angles_for_NN(coordinates, neighbors):
+    angles =[]
+    for i in range(len(coordinates)):
+        #for each atom find the 5 angles that make up the hexagonal strucutre and add it to a list  
+        #atom i
+        xi, yi = coordinates[i]
+        # near neiborours for atom i (already sorted)
+        Nn = coordinates[neighbors[i]]
+        #compure vecotrs from atom i to near neibours 
+        #and normalise 
+        vectors = Nn - np.array([xi,yi])
+        norms = np.linalg.norm(vectors,axis=1, keepdims=True)
+        vectors = vectors /norms
+
+        #now compute all 5 anlges around one atom  
+        angles_for_atomi =[]
+        for A in range(len(vectors)):
+            for B in range(a+1, len(vectors)):
+                dot = np.dot(vectors[B], vectors[A])
+                angles_for_atomi.append(np.arccos(dot))
+        # append atom i's 5 angle to a master list for all atoms 
+        angles.append(angles_for_atomi)
+    return angles
+
+
+
+def psi_six_local_order(angles,N):
+    "takes angles and nearest neighbour and returns psi 6 value"
+    psi = 0
+    for i in angles:
+        psi_i = 0 
+        for x in angles[i]: 
+            exponential = np.exp(6*np.j*angles[x])
+            psi_i = psi_i + exponential
+        psi += (np.mod(psi_i*(1/6)))
+
+    psi = psi*(1/N)
+    return psi
+
+def psi_six_global(angles,N):
+    "golbal version "
+    psi = 0
+    for i in angles:
+        psi_i = 0 
+        for x in angles[i]: 
+            exponential = np.exp(6*np.j*angles[x])
+            psi_i = psi_i + exponential
+        psi += (psi_i*(1/6))
+
+    psi = np.mod(psi*(1/N))
+    return psi
+
+
+def main():
+    coordinates = read_data("dump.LJ")
+
+    near_neighbours , Rmod = Number_near_neighbour(coordinates)
+
+    anlge_input = angles_for_NN(coordinates, near_neighbours)
+    N = len(coordinates)
+    psi= psi_six_local_order(anlge_input,N)
+    psi_global = psi_six_global(anlge_input,N)
+    print(f"The Psi 6 local value is {psi}")
+    print("-----------------------------")
+    print(f"The global value for psi 6 is {psi_global}")
