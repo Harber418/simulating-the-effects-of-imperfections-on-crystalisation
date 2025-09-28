@@ -22,19 +22,17 @@ def read_data(filename):
     return np.array(coordinates)
 
 
-
-
-def Number_near_neighbour (coordiantes, k=6):
+def Number_near_neighbour (coordinates, k=6):
     """
     works by taking a paricle and first the 6 closest neighbour
     start from a small mod (R) and make it slowly bigger, have a tollarance and stop when you get 6 in a regestatly
     """
-    N = len(coordiantes)
+    N = len(coordinates)
 
-    tree = cKDTree(coordiantes, boxsize=None)
+    tree = cKDTree(coordinates, boxsize=None)
     #qyery the tree to find a list of distances for nearest neighbors 
     #set workers=-1 is you do a batch job with more then one CPU, (-1 uses all available CPU's)
-    distances, indices = tree.query(coordiantes, k=k+1, workers=1)
+    distances, indices = tree.query(coordinates, k=k+1, workers=1)
 
     #don't include the particle you are queiring, first element will be 0 for distance 
     neighbors = indices[:, 1:]
@@ -56,13 +54,13 @@ def angles_for_NN(coordinates, neighbors):
         norms = np.linalg.norm(vectors,axis=1, keepdims=True)
         vectors = vectors /norms
 
-        #now compute all 5 anlges around one atom  
+        #now compute all 6 anlges around one atom  
         angles_for_atomi =[]
         for A in range(len(vectors)):
-            for B in range(a+1, len(vectors)):
+            for B in range(A+1, len(vectors)):
                 dot = np.dot(vectors[B], vectors[A])
                 angles_for_atomi.append(np.arccos(dot))
-        # append atom i's 5 angle to a master list for all atoms 
+        # append atom i's 6 angle to a master list for all atoms 
         angles.append(angles_for_atomi)
     return angles
 
@@ -71,12 +69,12 @@ def angles_for_NN(coordinates, neighbors):
 def psi_six_local_order(angles,N):
     "takes angles and nearest neighbour and returns psi 6 value"
     psi = 0
-    for i in angles:
+    for angle_list in angles:
         psi_i = 0 
-        for x in angles[i]: 
-            exponential = np.exp(6*np.j*angles[x])
+        for x in angle_list: 
+            exponential = np.exp(6j*x)
             psi_i = psi_i + exponential
-        psi += (np.mod(psi_i*(1/6)))
+        psi += (np.abs(psi_i*(1/6)))
 
     psi = psi*(1/N)
     return psi
@@ -84,14 +82,14 @@ def psi_six_local_order(angles,N):
 def psi_six_global(angles,N):
     "golbal version "
     psi = 0
-    for i in angles:
+    for anlge_list in angles:
         psi_i = 0 
-        for x in angles[i]: 
-            exponential = np.exp(6*np.j*angles[x])
+        for x in anlge_list: 
+            exponential = np.exp(6j*x)
             psi_i = psi_i + exponential
         psi += (psi_i*(1/6))
 
-    psi = np.mod(psi*(1/N))
+    psi = np.abs(psi*(1/N))
     return psi
 
 
