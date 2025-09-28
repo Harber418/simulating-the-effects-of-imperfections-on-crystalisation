@@ -105,3 +105,6 @@ def main():
     print(f"The Psi 6 local value is {psi}")
     print("-----------------------------")
     print(f"The global value for psi 6 is {psi_global}")
+
+if __name__ == "main":
+    main()
