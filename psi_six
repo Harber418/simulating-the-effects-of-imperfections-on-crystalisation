@@ -25,7 +25,7 @@ def read_data(filename):
 def Number_near_neighbour (coordinates, k=6):
     """
     works by taking a paricle and first the 6 closest neighbour
-    start from a small mod (R) and make it slowly bigger, have a tollarance and stop when you get 6 in a regestatly
+    start from a     small mod (R) and make it slowly bigger, have a tollarance and stop when you get 6 in a regestatly
     """
     N = len(coordinates)
 
@@ -56,17 +56,16 @@ def angles_for_NN(coordinates, neighbors):
 
         #now compute all 6 anlges around one atom  
         angles_for_atomi =[]
-        for A in range(len(vectors)):
-            for B in range(A+1, len(vectors)):
-                dot = np.dot(vectors[B], vectors[A])
-                angles_for_atomi.append(np.arccos(dot))
+        for A in vectors:
+            theta = np.arctan2(A[1], A[0]) 
+            angles_for_atomi.append(theta)
         # append atom i's 6 angle to a master list for all atoms 
         angles.append(angles_for_atomi)
     return angles
 
 
 
-def psi_six_local_order(angles,N):
+def psi_six_local_order(angles):
     "takes angles and nearest neighbour and returns psi 6 value"
     psi = 0
     for angle_list in angles:
@@ -74,22 +73,14 @@ def psi_six_local_order(angles,N):
         for x in angle_list: 
             exponential = np.exp(6j*x)
             psi_i = psi_i + exponential
-        psi += (np.abs(psi_i*(1/6)))
+        psi += psi_i
 
-    psi = psi*(1/N)
+    psi = psi*(1/6)
     return psi
 
-def psi_six_global(angles,N):
+def psi_six_global(local,N):
     "golbal version "
-    psi = 0
-    for anlge_list in angles:
-        psi_i = 0 
-        for x in anlge_list: 
-            exponential = np.exp(6j*x)
-            psi_i = psi_i + exponential
-        psi += (psi_i*(1/6))
-
-    psi = np.abs(psi*(1/N))
+    psi = np.abs(np.mean(local))
     return psi
 
 
@@ -100,9 +91,9 @@ def main():
 
     anlge_input = angles_for_NN(coordinates, near_neighbours)
     N = len(coordinates)
-    psi= psi_six_local_order(anlge_input,N)
-    psi_global = psi_six_global(anlge_input,N)
-    print(f"The Psi 6 local value is {psi}")
+    psi= psi_six_local_order(anlge_input)
+    psi_global = psi_six_global(psi,N)
+    print(f"The Psi 6 local value is {np.abs(psi)}")
     print("-----------------------------")
     print(f"The global value for psi 6 is {psi_global}")
 
