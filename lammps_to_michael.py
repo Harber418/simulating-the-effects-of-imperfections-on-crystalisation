@@ -1,3 +1,4 @@
+import csv
 def main():
     coordinates=[]
     with open("dump.LJ", "r") as f:
@@ -8,11 +9,10 @@ def main():
             x, y = float(data[2]), float(data[3])
             coordinates.append([x,y])
 
-    with open(pos_out, "w",newline="") as csvf:
-        writer =csv.writer(csvf)
-        writer.writerow()
+    with open("pos_file", "w",newline="") as csvf:
+        writer =csv.writer(csvf, delimiter=" ")
         for atom_i in coordinates:
-            writer.writerow(atom_i,f"{coordinates[atom_i][0]}",f"{coordinates[atom_i][1]}")
+            writer.writerow([f"{atom_i[0]}",f"{atom_i[1]}"])
 
 
 if __name__ == "__main__":
