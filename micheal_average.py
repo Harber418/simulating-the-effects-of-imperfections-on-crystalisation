@@ -1,7 +1,7 @@
-import csv
+import numpy as np
 def main():
     psi=[]
-    with open("test", "r") as f:
+    with open("test_30_9_25.txt", "r") as f:
         lines =f.readlines()
         atom_positions = lines[1:]
         for atom in atom_positions:
