@@ -4,7 +4,24 @@ Psi 6 is a method for calculating how close to perfectly hexagonal a crystal arr
 """
 import numpy as np
 from scipy.spatial import cKDTree
-
+import matplotlib.pyplot as plt
+ 
+def read_better(file):
+    coordinates=[]
+    with open("dump.LJ", "r") as f:
+        lines =f.readlines()
+        for i in range(1,102):
+            index1 = i*1009 +9 
+            index2 = index1 + 1000
+            set1 = []
+            atom_positions = lines[index1:index2]
+            for atom in atom_positions:
+                data =atom.split()
+                x, y = float(data[2]), float(data[3])
+                set1.append([x,y])
+            coordinates.append(set1)
+            
+    return np.array(coordinates)
 
 def read_data(filename):
     coordinates=[]
@@ -86,20 +103,35 @@ def psi_six_global2(local,N):
     return np.mean(np.abs(local))
 
 def main():
-    coordinates = read_data("dump.LJ")
+    coordinates = read_better("dump.LJ")
 
-    near_neighbours , Rmod = Number_near_neighbour(coordinates)
+    psi_per_time =[]
 
-    anlge_input = angles_for_NN(coordinates, near_neighbours)
-    N = len(coordinates)
-    psi= psi_six_local_order(anlge_input)
-    psi_global = psi_six_global(psi,N)
-    psi_global2 = psi_six_global2(psi,N)
+    for timestep in coordinates:
+
+        near_neighbours , Rmod = Number_near_neighbour(timestep)
+
+        anlge_input = angles_for_NN(timestep, near_neighbours)
+        N = len(timestep)
+        psi= psi_six_local_order(anlge_input)
+
+        psi_global = psi_six_global(psi,N)
+        psi_global2 = psi_six_global2(psi,N)
+        psi_per_time.append(psi_global2)
+    x = np.arange(len(psi_per_time))
+    
+
+    plt.plot(x , psi_per_time)
+    plt.xlabel("time steps")
+    plt.ylabel("psi 6")
+    plt.title("Plot")
+    plt.show() 
     #print(f"The Psi 6 local value is {np.abs(psi)}")
+
     print("-----------------------------")
-    print(f"The global value for psi 6 is {psi_global}")
+    print(f"The global value for psi 6 is {psi_per_time[-1]}")
     print("-----------------------------")
-    print(f"The global2 value for psi 6 is {psi_global2}")
+    print(f"The global2 value for psi 6 is {psi_per_time[-1]}")
 
 if __name__ == "__main__":
     main()
