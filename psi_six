@@ -5,7 +5,8 @@ Psi 6 is a method for calculating how close to perfectly hexagonal a crystal arr
 import numpy as np
 from scipy.spatial import cKDTree
 import matplotlib.pyplot as plt
- 
+from scipy.spatial import Delaunay
+
 def read_better(file):
     coordinates=[]
     with open("dump.LJ", "r") as f:
@@ -56,6 +57,45 @@ def Number_near_neighbour (coordinates, k=6):
     distances = distances[:, 1:]
     
     return neighbors, distances
+
+def Number_near_neighbout_delinea(coordinates):
+    tri = Delaunay(coordinates)
+    triangles = tri.simplices
+    tres =3.0
+
+    def circumradius(try_pts):
+        a = np.linalg.norm(try_pts[0]-try_pts[1])
+        b = np.linalg.norm(try_pts[1]-try_pts[2])
+        c = np.linalg.norm(try_pts[2]-try_pts[0])
+        s = 0.5*(a+b+c)
+        area = max(s*(s-a)*(s-b)*(s-c),0.0)**0.5
+        if area == 0: return np.inf
+        return (a*b*c)/(4.0*area)
+    
+
+
+
+    # Perform Delaunay triangulation
+
+    # Filter out triangles whose circumradius is too large
+    triangles = tri.simplices
+    tri_radii = np.asarray([circumradius(coordinates[t]) for t in triangles])
+    med_radius = np.median(tri_radii)
+    thres *= med_radius
+    triangles = triangles[tri_radii < thres]
+
+    # Create the neighbour lists - only consider the filtered triangles based on
+    # the threshold on circumradius
+    neighbours = [set() for i in range(len(coordinates))]
+    for s in triangles:
+        for i in s:
+            for j in s:
+                if (i != j):
+                    neighbours[i].add(j)
+    return neighbours
+
+
+
 
 def angles_for_NN(coordinates, neighbors):
     angles =[]
@@ -109,7 +149,7 @@ def main():
 
     for timestep in coordinates:
 
-        near_neighbours , Rmod = Number_near_neighbour(timestep)
+        near_neighbours = Number_near_neighbout_delinea(timestep)
 
         anlge_input = angles_for_NN(timestep, near_neighbours)
         N = len(timestep)
