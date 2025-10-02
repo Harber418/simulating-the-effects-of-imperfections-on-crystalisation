@@ -20,9 +20,10 @@ def read_better(file):
                 data =atom.split()
                 x, y = float(data[2]), float(data[3])
                 set1.append([x,y])
-            coordinates.append(set1)
+            coordinates.append(np.array(set1, dtype=float))
             
-    return np.array(coordinates)
+    return np.array(coordinates, dtype=object)
+
 
 def read_data(filename):
     coordinates=[]
@@ -65,7 +66,7 @@ def Number_near_neighbour (coordinates, limit=1.3, k=6):
         if i in Neighbors[i]:
          #if particle 10 is in the list of neighbors for 10 then remove it
          Neighbors[i].remove(i)
-    count.append(len(Neighbors[i]))
+        count.append(len(Neighbors[i]))
 
 
     
@@ -102,8 +103,6 @@ def Number_near_neighbout_delinea(coordinates):
                 if (i != j):
                     neighbours[i].add(j)
     return neighbours
-
-
 
 
 def angles_for_NN(coordinates, neighbors):
