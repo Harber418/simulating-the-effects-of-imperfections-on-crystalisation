@@ -45,16 +45,16 @@ def Number_near_neighbour (coordinates, limit=1.3, k=6):
     works by taking a paricle and first the 6 closest neighbour
     start from a     small mod (R) and make it slowly bigger, have a tollarance and stop when you get 6 in a regestatly
     """
-    N = len(coordinates)
+    #N = len(coordinates)
 
     tree = cKDTree(coordinates, boxsize=None)
     #qyery the tree to find a list of distances for nearest neighbors 
     #set workers=-1 is you do a batch job with more then one CPU, (-1 uses all available CPU's)
-    distances, indices = tree.query(coordinates, k=k+1, workers=1)
+    #distances, indices = tree.query(coordinates, k=k+1, workers=1)
 
     #don't include the particle you are queiring, first element will be 0 for distance 
-    neighbors = indices[:, 1:]
-    distances = distances[:, 1:]
+    #neighbors = indices[:, 1:]
+    #distances = distances[:, 1:]
 
     # this calculates near neighbors witha cut off of 1.3 * a 
     Neighbors = tree.query_ball_point(coordinates,r=limit)
@@ -62,16 +62,11 @@ def Number_near_neighbour (coordinates, limit=1.3, k=6):
     count =[]
     #a way to count the number of near neighbors for each atom i 
     for i in range(len(Neighbors)):
-        Nnn = Neighbors[i]
-        atom_i=[]
-        #make sure not to double count neighbours 
-        for j in Nnn:
-            if j!= i:
-                atom_i.append(j)
+        if i in Neighbors[i]:
+         #if particle 10 is in the list of neighbors for 10 then remove it
+         Neighbors[i].remove(i)
+    count.append(len(Neighbors[i]))
 
-
-        count.append(len(Nnn))
-        Neighbors[i] = atom_i
 
     
     return Neighbors, np.array(count)
@@ -173,7 +168,7 @@ def main():
 
     psi_per_time =[]
 
-    for timestep in coordinates:
+    for timestep in coordinates[:10]:
 
         near_neighbours, count = Number_near_neighbour(timestep)
 
