@@ -41,7 +41,7 @@ def read_data(filename):
     return np.array(coordinates)
 
 
-def Number_near_neighbour (coordinates, limit=1.3, k=6):
+def Number_near_neighbour (coordinates, limit=1.2, k=6):
     """
     works by taking a paricle and first the 6 closest neighbour
     start from a     small mod (R) and make it slowly bigger, have a tollarance and stop when you get 6 in a regestatly
@@ -66,10 +66,9 @@ def Number_near_neighbour (coordinates, limit=1.3, k=6):
         if i in Neighbors[i]:
          #if particle 10 is in the list of neighbors for 10 then remove it
          Neighbors[i].remove(i)
+
         count.append(len(Neighbors[i]))
-
-
-    
+        
     return Neighbors, np.array(count)
 
 def Number_near_neighbout_delinea(coordinates):
@@ -112,10 +111,10 @@ def angles_for_NN(coordinates, neighbors):
         #atom i
         xi, yi = coordinates[i]
         # near neiborours for atom i (already sorted)
-        Nn = coordinates[neighbors[i]]
+        Nn = np.array(coordinates[neighbors[i]], dtype=float)
         #compure vecotrs from atom i to near neibours 
         #and normalise 
-        vectors = Nn - np.array([xi,yi])
+        vectors = Nn - np.array([xi,yi], dtype=float)
         norms = np.linalg.norm(vectors,axis=1, keepdims=True)
         norms[norms == 0] = 1.0 
         vectors = vectors /norms
@@ -167,7 +166,7 @@ def main():
 
     psi_per_time =[]
 
-    for timestep in coordinates[:10]:
+    for timestep in coordinates:
 
         near_neighbours, count = Number_near_neighbour(timestep)
 
