@@ -167,7 +167,7 @@ def vmd_file_wrier(coordinates, count):
         f.write(f"atoms\n")
         for i , (x,y) in enumerate(coordinates):
             atom_type = count[i]  
-            f.write(f"{atom_type} {x:.7f} {y:.7f} 0.0\n")
+            f.write(f"{i} {atom_type} {x:.7f} {y:.7f} 0.5\n")
     
 
 def main():
