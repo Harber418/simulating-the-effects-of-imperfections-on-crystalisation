@@ -6,6 +6,7 @@ import numpy as np
 from scipy.spatial import cKDTree
 import matplotlib.pyplot as plt
 from scipy.spatial import Delaunay
+import time 
 
 def read_better(file):
     coordinates=[]
@@ -68,7 +69,7 @@ def Number_near_neighbour (coordinates, limit=1.2, k=6):
          Neighbors[i].remove(i)
 
         count.append(len(Neighbors[i]))
-        
+
     return Neighbors, np.array(count)
 
 def Number_near_neighbout_delinea(coordinates):
@@ -165,8 +166,8 @@ def main():
     coordinates = read_better("dump.LJ")
 
     psi_per_time =[]
-
     for timestep in coordinates:
+        start=time.time()
 
         near_neighbours, count = Number_near_neighbour(timestep)
 
@@ -177,6 +178,9 @@ def main():
         psi_global = psi_six_global(psi,N)
         psi_global2 = psi_six_global2(psi,N)
         psi_per_time.append(psi_global2)
+        end = time.time()
+        elapsed = end - start
+        print(f" psi 6 is {psi_global2:.4f}, time taken {elapsed} seconds")
 
     vmd_file_wrier(coordinates[-1],count)
     print(f"written file vmd_input.xyz ")
