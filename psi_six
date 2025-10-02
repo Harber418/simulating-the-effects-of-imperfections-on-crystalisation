@@ -40,7 +40,7 @@ def read_data(filename):
     return np.array(coordinates)
 
 
-def Number_near_neighbour (coordinates, k=6):
+def Number_near_neighbour (coordinates, limit=1.3, k=6):
     """
     works by taking a paricle and first the 6 closest neighbour
     start from a     small mod (R) and make it slowly bigger, have a tollarance and stop when you get 6 in a regestatly
@@ -55,8 +55,26 @@ def Number_near_neighbour (coordinates, k=6):
     #don't include the particle you are queiring, first element will be 0 for distance 
     neighbors = indices[:, 1:]
     distances = distances[:, 1:]
+
+    # this calculates near neighbors witha cut off of 1.3 * a 
+    Neighbors = tree.query_ball_point(coordinates,r=limit)
+    # count, number of neighbours for each atom, used in coloured vmd
+    count =[]
+    #a way to count the number of near neighbors for each atom i 
+    for i in range(len(Neighbors)):
+        Nnn = Neighbors[i]
+        atom_i=[]
+        #make sure not to double count neighbours 
+        for j in Nnn:
+            if j!= i:
+                atom_i.append(j)
+
+
+        count.append(len(Nnn))
+        Neighbors[i] = atom_i
+
     
-    return neighbors, distances
+    return Neighbors, np.array(count)
 
 def Number_near_neighbout_delinea(coordinates):
     tri = Delaunay(coordinates)
@@ -70,11 +88,7 @@ def Number_near_neighbout_delinea(coordinates):
         s = 0.5*(a+b+c)
         area = max(s*(s-a)*(s-b)*(s-c),0.0)**0.5
         if area == 0: return np.inf
-        return (a*b*c)/(4.0*area)
-    
-
-
-
+        return (a*b*c)/(4.0*area)    
     # Perform Delaunay triangulation
 
     # Filter out triangles whose circumradius is too large
@@ -109,6 +123,7 @@ def angles_for_NN(coordinates, neighbors):
         #and normalise 
         vectors = Nn - np.array([xi,yi])
         norms = np.linalg.norm(vectors,axis=1, keepdims=True)
+        norms[norms == 0] = 1.0 
         vectors = vectors /norms
 
         #now compute all 6 anlges around one atom  
@@ -142,6 +157,17 @@ def psi_six_global(local,N):
 def psi_six_global2(local,N):
     return np.mean(np.abs(local))
 
+
+def vmd_file_wrier(coordinates, count):
+
+    with open("vmd_input.xyz", "w") as f:
+        f.write(f"{len(coordinates)}\n")
+        f.write(f"atoms\n")
+        for i , (x,y) in enumerate(coordinates):
+            atom_type = count[i]  
+            f.write(f"{atom_type} {x:.7f} {y:.7f} 0.0\n")
+    
+
 def main():
     coordinates = read_better("dump.LJ")
 
@@ -149,7 +175,7 @@ def main():
 
     for timestep in coordinates:
 
-        near_neighbours = Number_near_neighbout_delinea(timestep)
+        near_neighbours, count = Number_near_neighbour(timestep)
 
         anlge_input = angles_for_NN(timestep, near_neighbours)
         N = len(timestep)
@@ -158,8 +184,11 @@ def main():
         psi_global = psi_six_global(psi,N)
         psi_global2 = psi_six_global2(psi,N)
         psi_per_time.append(psi_global2)
+
+    vmd_file_wrier(coordinates[-1],count)
+    print(f"written file vmd_input.xyz ")
+
     x = np.arange(len(psi_per_time))
-    
 
     plt.plot(x , psi_per_time)
     plt.xlabel("time steps")
