@@ -193,7 +193,7 @@ def main():
     #print(f"The Psi 6 local value is {np.abs(psi)}")
 
     print("-----------------------------")
-    print(f"The global value for psi 6 is {psi_per_time[-1]}")
+    print(f"The global value for psi 6 is .. {psi_per_time[-1]}")
     print("-----------------------------")
     print(f"The global2 value for psi 6 is {psi_per_time[-1]}")
 
