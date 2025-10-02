@@ -42,7 +42,7 @@ def read_data(filename):
     return np.array(coordinates)
 
 
-def Number_near_neighbour (coordinates, limit=1.2, k=6):
+def Number_near_neighbour (coordinates, limit=1.3, k=6):
     """
     works by taking a paricle and first the 6 closest neighbour
     start from a     small mod (R) and make it slowly bigger, have a tollarance and stop when you get 6 in a regestatly
@@ -70,7 +70,7 @@ def Number_near_neighbour (coordinates, limit=1.2, k=6):
 
         count.append(len(Neighbors[i]))
 
-    return Neighbors, np.array(count)
+    return Neighbors, count
 
 def Number_near_neighbout_delinea(coordinates):
     tri = Delaunay(coordinates)
@@ -166,21 +166,22 @@ def main():
     coordinates = read_better("dump.LJ")
 
     psi_per_time =[]
-    for timestep in coordinates:
-        start=time.time()
+    #for timestep in coordinates:
+     #   start=time.time()
+#
+ #       near_neighbours, count = Number_near_neighbour(timestep)
+#
+ #       anlge_input = angles_for_NN(timestep, near_neighbours)
+  #      N = len(timestep)
+    #    psi= psi_six_local_order(anlge_input)
 
-        near_neighbours, count = Number_near_neighbour(timestep)
-
-        anlge_input = angles_for_NN(timestep, near_neighbours)
-        N = len(timestep)
-        psi= psi_six_local_order(anlge_input)
-
-        psi_global = psi_six_global(psi,N)
-        psi_global2 = psi_six_global2(psi,N)
-        psi_per_time.append(psi_global2)
-        end = time.time()
-        elapsed = end - start
-        print(f" psi 6 is {psi_global2:.4f}, time taken {elapsed} seconds")
+   #     psi_global = psi_six_global(psi,N)
+    #    psi_global2 = psi_six_global2(psi,N)
+     #   psi_per_time.append(psi_global2)
+      #  end = time.time()
+       # elapsed = end - start
+        #print(f" psi 6 is {psi_global2:.4f}, time taken {elapsed:.2f} seconds")
+    near_neighbours, count = Number_near_neighbour(coordinates[-1])
 
     vmd_file_wrier(coordinates[-1],count)
     print(f"written file vmd_input.xyz ")
