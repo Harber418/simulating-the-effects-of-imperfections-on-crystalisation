@@ -62,7 +62,7 @@ def generate_lammps(lx=30,ly=30,ntype=100,nbead=1000, seed = 33,mean=1,sd=0.1, f
     sample_mean = np.mean(masses)
     
     PD = 100 * sigma/sample_mean
-    print(f"The polydispericty is {PD}%with a sample sigma of {sigma} and a sample mean of {sample_mean}")
+    print(f"The polydispericty is {PD:.6f}%with a sample sigma of {sigma:.6f} and a sample mean of {sample_mean:.4f}")
     return 
 
 
