@@ -8,19 +8,6 @@ def generate_lammps(lx=30,ly=30,ntype=100,nbead=1000, seed = 33,mean=1,sd=0.1, f
     """
     Generate a 2D LAMMPS data file with random bead positions and masses 
     pulled from a gaussian distribution
-    
-    Parameters
-    ----------
-    lx, ly : float
-        Box lengths in x and y directions
-    ntype : int
-        Number of atom types
-    nbead : int
-        Number of beads (atoms)
-    seed : int
-        Random number seed
-    filename : str
-        Output filename name
     """
     rng = np.random.default_rng(seed)
 
@@ -40,9 +27,9 @@ def generate_lammps(lx=30,ly=30,ntype=100,nbead=1000, seed = 33,mean=1,sd=0.1, f
         masses = []
         for i in range(1, nbead + 1):
             # each atom gets a unique mass pulled form gaussian
-            PD = 100*rng.normal(loc=mean, scale=sd)  # Mean 1.0, stddev 0.1
+            m = rng.normal(loc=mean, scale=sd)  # Mean 1.0, stddev 0.1
             # then each mass is binned into nytype bins
-            masses.append(PD)
+            masses.append(m)
         #make nypte evenly spaced bins between max and min values 
         bins = np.linspace(min(masses), max(masses), ntype+1)
         inds = np.digitize(masses, bins)
@@ -71,6 +58,11 @@ def generate_lammps(lx=30,ly=30,ntype=100,nbead=1000, seed = 33,mean=1,sd=0.1, f
             f.write(f"{atom_id} 0.0 0.0 0.0\n")
 
     print(f"LAMMPS input written to {filename} with 100 bins")
+    sigma = np.std(masses)
+    sample_mean = np.mean(masses)
+    
+    PD = 100 * sigma/sample_mean
+    print(f"The polydispericty is {PD}%with a sample sigma of {sigma} and a sample mean of {sample_mean}")
     return 
 
 
