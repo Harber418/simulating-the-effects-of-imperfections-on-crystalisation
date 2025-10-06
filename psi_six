@@ -83,7 +83,7 @@ def Number_near_neighbour (coordinates, limits=1.2, k=6):
 def Number_near_neighbout_delinea(coordinates):
     tri = Delaunay(coordinates)
     triangles = tri.simplices
-    thres =1.1
+    thres =3.0
 
     def circumradius(try_pts):
         a = np.linalg.norm(try_pts[0]-try_pts[1])
