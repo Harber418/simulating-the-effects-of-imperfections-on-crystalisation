@@ -4,7 +4,7 @@ Code that pulls lammps input sizes from a gaussian
 """
 import numpy as np 
 
-def generate_lammps( lx=30,ly=30,ntype=100,nbead=1000, seed = 33,mean=1,sd=0.1 filename="lamps_pd"):
+def generate_lammps(lx=30,ly=30,ntype=100,nbead=1000, seed = 33,mean=1,sd=0.1 filename="lamps_pd"):
     """
     Generate a 2D LAMMPS data file with random bead positions and masses 
     pulled from a gaussian distribution
@@ -20,7 +20,7 @@ def generate_lammps( lx=30,ly=30,ntype=100,nbead=1000, seed = 33,mean=1,sd=0.1 f
     seed : int
         Random number seed
     filename : str
-        Output filename (default: lammps_input)
+        Output filename name
     """
     rng = np.random.default_rng(seed)
 
@@ -72,5 +72,7 @@ def generate_lammps( lx=30,ly=30,ntype=100,nbead=1000, seed = 33,mean=1,sd=0.1 f
 
     print(f"LAMMPS input written to {filename} with 100 bins")
     return 
+
+
 if __name__ == "__main__":
-    generate_lammps(ntype=100, mean=1.0, sd=0.1)
+    generate_lammps(ntype=100, mean=1.0, sd=0.1, filename="lammps_pd")
