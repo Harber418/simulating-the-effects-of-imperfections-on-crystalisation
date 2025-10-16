@@ -1,4 +1,3 @@
-
 """
 Psi 6 is a method for calculating how close to perfectly hexagonal a crystal arrangment is 
 """
@@ -172,39 +171,56 @@ def vmd_file_wrier(coordinates, count):
             atom_type = count[i]  
             f.write(f"{i} {atom_type} {x:.7f} {y:.7f} 0.5\n")
     
+def plot(coordinates):
+    psi_per_time=[]
+
+    for i in range(len(coordinates)):
+        start=time.time()
+
+        near_neighbours, count = Number_near_neighbout_delinea(coordinates[i])
+
+        anlge_input = angles_for_NN(coordinates[i], near_neighbours)
+        N = len(coordinates[i])
+        psi= psi_six_local_order(anlge_input)
+
+        psi_global = psi_six_global(psi,N)
+        psi_global2 = psi_six_global2(psi,N)
+        psi_per_time.append(psi_global2)
+        end = time.time()
+        elapsed = end - start
+        print(f" psi 6 is {psi_global2:.4f}, time taken {elapsed:.2f} seconds")
+        return psi_per_time
 
 def main():
     coordinates = read_better("dump.LJ")
 
     limit = scale_limit(coordinates[-1])
-    psi_per_time =[]
-    #for timestep in coordinates:
-     #   start=time.time()
-#
- #       near_neighbours, count = Number_near_neighbour(timestep)
-#
- #       anlge_input = angles_for_NN(timestep, near_neighbours)
-  #      N = len(timestep)
-    #    psi= psi_six_local_order(anlge_input)
-
-   #     psi_global = psi_six_global(psi,N)
-    #    psi_global2 = psi_six_global2(psi,N)
-     #   psi_per_time.append(psi_global2)
-      #  end = time.time()
-       # elapsed = end - start
-        #print(f" psi 6 is {psi_global2:.4f}, time taken {elapsed:.2f} seconds")
+    psi_per_time = plot(coordinates)
+    #results for the last time step taken seperatly     
     near_neighbours, count = Number_near_neighbour(coordinates[-1], limits=limit)
     nn, cc = Number_near_neighbout_delinea(coordinates[-1])
     print(f"mean count for tree is {np.mean(count):.2f}, mean count for delaunay is {np.mean(cc):.2f}")
+    #ckdtree method 
+    anlge_input = angles_for_NN(coordinates[-1], near_neighbours)
+    N = len(coordinates[-1])
+    psi= psi_six_local_order(anlge_input)
+
+    psi_global = psi_six_global(psi,N)
+    psi_global2 = psi_six_global2(psi,N)
+    print(f"the tree average is {psi_global2}")
+    #delinea
+    anlge_input2 = angles_for_NN(coordinates[-1], nn)
+    N = len(coordinates[-1])
+    psi2= psi_six_local_order(anlge_input2)
 
 
+    psi_global3 = psi_six_global2(psi2,N)
+    print(f"the delinea psi is {psi_global3}")
 
+
+    # plot for elequilibriation 
     vmd_file_wrier(coordinates[-1],count)
-
-
-
-    print(f"written file vmd_input.xyz ")
-
+    
     x = np.arange(len(psi_per_time))
 
     plt.plot(x , psi_per_time)
@@ -216,8 +232,7 @@ def main():
 
     print("-----------------------------")
     print(f"The global value for psi 6 is .. {psi_per_time[-1]}")
-    print("-----------------------------")
-    print(f"The global2 value for psi 6 is {psi_per_time[-1]}")
+
 
 if __name__ == "__main__":
     main()
