@@ -71,11 +71,17 @@ def main():
     coordiantes, COLOUR = read_better("dump.LJ")
     snap= coordiantes[-1]
     Neighbors, count = Number_near_neighbout_delinea(snap)
-    plt.scatter(snap[0] , snap[1], c=count, cmap='vir
-    #plt.scatter(snap[0] , snap[1], c=COLOUR[-1], cmap='viridis', s=50,marker='o')
+
+    x,y = snap[:,0], snap[:,1]
+    scatter_plot = plt.scatter(x , y,c=COLOUR[-1],marker='o')
+    
     plt.xlabel("x coordinate")
     plt.ylabel("y coordinate")
     plt.title("scatter for last time step")
+    cbar = plt.colorbar(scatter_plot)
+    cbar.set_label("size of particles")
+
+    plt.tight_layout()
     plt.show() 
 
 if __name__ == "__main__":
