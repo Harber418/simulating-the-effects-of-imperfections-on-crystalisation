@@ -21,9 +21,14 @@ def read_better(file):
             atom_positions = lines[index1:index2]
             for atom in atom_positions:
                 data =atom.split()
-                colour, x, y = float(data[1]),float(data[2]), float(data[3])
+                c, x, y = float(data[1]),float(data[2]), float(data[3])
                 set1.append([x,y])
-                set2.append(colour)
+                nbin = 60
+                minsigma = 0.4
+                maxsigma = 1.6
+                binsize = (maxsigma - minsigma) / float(nbin)
+                sigma = minsigma + (c - 0.5) * binsize
+                set2.append(sigma)
             coordinates.append(np.array(set1, dtype=float))
             COLOUR.append(np.array(set2, dtype=float))
 
