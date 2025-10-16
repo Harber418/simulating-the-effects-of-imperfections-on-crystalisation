@@ -23,7 +23,7 @@ def read_better(file):
                 data =atom.split()
                 colour, x, y = float(data[1]),float(data[2]), float(data[3])
                 set1.append([x,y])
-                set2.append([colour])
+                set2.append(colour)
             coordinates.append(np.array(set1, dtype=float))
             COLOUR.append(np.array(set2, dtype=float))
 
@@ -70,8 +70,9 @@ def Number_near_neighbout_delinea(coordinates):
 def main():
     coordiantes, COLOUR = read_better("dump.LJ")
     snap= coordiantes[-1]
-
-    plt.scatter(snap[0] , snap[1], c=COLOUR[-1], cmap='viridis', s=50,marker='o')
+    Neighbors, count = Number_near_neighbout_delinea(snap)
+    plt.scatter(snap[0] , snap[1], c=count, cmap='vir
+    #plt.scatter(snap[0] , snap[1], c=COLOUR[-1], cmap='viridis', s=50,marker='o')
     plt.xlabel("x coordinate")
     plt.ylabel("y coordinate")
     plt.title("scatter for last time step")
