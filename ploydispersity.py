@@ -17,9 +17,9 @@ def generate_lammps(lx=35, ly=35, nbead=1000, seed=33,
     rng = np.random.default_rng(seed)
 
     # Random 2D positions
-    x = (rng.random(nbead) * 2 - 1) * lx / 2.0
-    y = (rng.random(nbead) * 2 - 1) * ly / 2.0
-    z = np.zeros(nbead)
+    #x = (rng.random(nbead) * 2 - 1) * lx / 2.0
+    #y = (rng.random(nbead) * 2 - 1) * ly / 2.0
+    #z = np.zeros(nbead)
 
     # Arrays
     bead_type = np.zeros(nbead, dtype=int)
@@ -45,6 +45,21 @@ def generate_lammps(lx=35, ly=35, nbead=1000, seed=33,
     # Count how many beads of each type
     unique, counts = np.unique(bead_type, return_counts=True)
     type_counts = dict(zip(unique, counts))
+
+    #fin the area fravtion 
+    areaf = lx*ly/(1000*(np.pi*(mean/2)**2))
+    print(f"area fraction initial is {areaf:.2f}")
+    area_current = lx*ly/(np.sum(np.pi*(sigma/2)**2))
+
+    lx = lx * np.sqrt(areaf/area_current)
+    ly = ly * np.sqrt(areaf/area_current)
+    print(f"updated box size to lx={lx:.2f}, ly={ly:.2f} to achieve area fraction {areaf:.3f}")
+    #update the new size of the box 
+
+    # Random 2D positions
+    x = (rng.random(nbead) * 2 - 1) * lx / 2.0
+    y = (rng.random(nbead) * 2 - 1) * ly / 2.0
+    z = np.zeros(nbead)
 
     # --- Write LAMMPS data file ---
     with open(filename, "w") as f:
@@ -105,4 +120,4 @@ def generate_lammps(lx=35, ly=35, nbead=1000, seed=33,
 
 
 if __name__ == "__main__":
-    generate_lammps(mean=1.0, sd=0.18, filename="lammps_input_pd", statsfile="type_stats.txt")
+    generate_lammps(lx=35,ly=35, mean=1.0, sd=0.18, filename="lammps_input_pd", statsfile="type_stats.txt")
