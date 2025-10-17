@@ -78,7 +78,7 @@ def main():
     Neighbors, count = Number_near_neighbout_delinea(snap)
 
     x,y = snap[:,0], snap[:,1]
-    scatter_plot = plt.scatter(x , y,c=COLOUR[-1],marker='o')
+    scatter_plot = plt.scatter(x , y,c=COLOUR[-1],marker='o',s=COLOUR[-1]*20)
     
     plt.xlabel("x coordinate")
     plt.ylabel("y coordinate")
