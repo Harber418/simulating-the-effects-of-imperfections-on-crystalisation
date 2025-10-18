@@ -172,6 +172,9 @@ def vmd_file_wrier(coordinates, count):
             f.write(f"{i} {atom_type} {x:.7f} {y:.7f} 0.5\n")
     
 def plot(coordinates):
+    """
+    plot of psi 6 over interations of lammps simulation 
+    """
     psi_per_time=[]
 
     for i in range(len(coordinates)):
@@ -190,6 +193,17 @@ def plot(coordinates):
         elapsed = end - start
         print(f" psi 6 is {psi_global2:.4f}, time taken {elapsed:.2f} seconds")
         return psi_per_time
+
+def redisdulas(time_step):
+    "r = psi(t) - psi(t-1)  || this is the result of np.diff"
+    time_step = np.array(time_step)
+    r = np.diff(time_step, axis=0)
+    plt.plot(r)
+    plt.xlabel("iterations of lammps simulation")
+    plt.ylabel("residual value")
+    plt.title("residual plot for psi 6 simulation")
+
+    plt.show()
 
 def main():
     coordinates = read_better("dump.LJ")
@@ -220,7 +234,7 @@ def main():
 
     # plot for elequilibriation 
     vmd_file_wrier(coordinates[-1],count)
-    
+
     x = np.arange(len(psi_per_time))
 
     plt.plot(x , psi_per_time)
