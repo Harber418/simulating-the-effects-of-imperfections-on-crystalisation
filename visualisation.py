@@ -89,5 +89,19 @@ def main():
     plt.tight_layout()
     plt.show() 
 
+def main2():
+    coordiantes, COLOUR = read_better("dump.LJ")
+    snap= coordiantes[-1]
+    x,y = snap[:,0], snap[:,1]
+    Neighbors, count = Number_near_neighbout_delinea(snap)
+    plt.xlabel("x coordinate")
+    plt.ylabel("y coordinate")
+    plt.title("Neighbor count for crystal")
+    sc = plt.scatter(x,y,c=count, marker='o', s=COLOUR[-1]*20)
+    cbar = plt.colorbar(sc)
+    cbar.set_label("number of nearest neighbours")
+    plt.tight_layout()
+    plt.show() 
+
 if __name__ == "__main__":
     main()
