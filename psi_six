@@ -233,7 +233,6 @@ def main():
 
 
     # plot for elequilibriation 
-    vmd_file_wrier(coordinates[-1],count)
 
     x = np.arange(len(psi_per_time))
 
@@ -242,6 +241,9 @@ def main():
     plt.ylabel("psi 6")
     plt.title("Plot")
     plt.show() 
+    # residulas plot 
+    redisdulas(psi_per_time)
+
     #print(f"The Psi 6 local value is {np.abs(psi)}")
 
     print("-----------------------------")
