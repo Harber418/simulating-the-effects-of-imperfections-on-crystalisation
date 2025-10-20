@@ -19,6 +19,14 @@ def read_better(file):
             for atom in atom_positions:
                 data =atom.split()
                 x, y = float(data[2]), float(data[3])
+                if x > 0.95:
+                    pass 
+                elif y > 0.95:
+                    pass 
+                elif x < -0.05:
+                    pass
+                elif y < -0.05:
+                    pass
                 set1.append([x,y])
             coordinates.append(np.array(set1, dtype=float))
             
