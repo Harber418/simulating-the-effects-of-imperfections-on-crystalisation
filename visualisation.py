@@ -1,4 +1,5 @@
 
+
 """
 a tool to visualise the colloids in the box like vmd 
 plots for colour reltates to size 
@@ -72,24 +73,26 @@ def Number_near_neighbout_delinea(coordinates):
     return neighbours, count
 
 
-def main():
+def size():
     coordiantes, COLOUR = read_better("dump.LJ")
     snap= coordiantes[-1]
-    Neighbors, count = Number_near_neighbout_delinea(snap)
+
 
     x,y = snap[:,0], snap[:,1]
-    scatter_plot = plt.scatter(x , y,c=COLOUR[-1],marker='o',s=COLOUR[-1]*20)
+    scatter_plot = plt.scatter(x , y,c=COLOUR[-1],marker='o',cmap='jet',s=COLOUR[-1]*20, vmin=0.54, vmax=1.4)
     
-    plt.xlabel("x coordinate")
-    plt.ylabel("y coordinate")
-    plt.title("scatter for last time step")
+    plt.xlabel("position x ")
+    plt.ylabel("position y ")
+    plt.title("Colloid crystal (polydispersity 14.73%)")
     cbar = plt.colorbar(scatter_plot)
     cbar.set_label("size of particles")
 
     plt.tight_layout()
     plt.show() 
-
-def main2():
+    
+def main():
+    size()
+    
     coordiantes, COLOUR = read_better("dump.LJ")
     snap= coordiantes[-1]
     x,y = snap[:,0], snap[:,1]
@@ -102,6 +105,6 @@ def main2():
     cbar.set_label("number of nearest neighbours")
     plt.tight_layout()
     plt.show() 
-
+    
 if __name__ == "__main__":
     main()
