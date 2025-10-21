@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def generate_lammps(lx=35, ly=35, nbead=1000, seed=33,
+def generate_lammps(lx=30, ly=30, nbead=1000, seed=33,
                     mean=1.0, sd=0.1, filename="lammps_pd.data",
                     statsfile="type_stats.txt", make_plot=True):
     """
@@ -47,12 +47,12 @@ def generate_lammps(lx=35, ly=35, nbead=1000, seed=33,
     type_counts = dict(zip(unique, counts))
 
     #fin the area fravtion 
-    areaf = lx*ly/(1000*(np.pi*(mean/2)**2))
+    areaf = 1000*(np.pi*(mean/2)**2)/(lx*ly)
     print(f"area fraction initial is {areaf:.2f}")
-    area_current = lx*ly/(np.sum(np.pi*(sigma/2)**2))
+    area_current = (np.sum(np.pi*(sigma/2)**2))/(lx*ly)
 
-    lx = lx * np.sqrt(areaf/area_current)
-    ly = ly * np.sqrt(areaf/area_current)
+    lx = lx * np.sqrt(area_current/areaf)
+    ly = ly * np.sqrt(area_current/areaf)
     print(f"updated box size to lx={lx:.2f}, ly={ly:.2f} to achieve area fraction {areaf:.3f}")
     #update the new size of the box 
 
