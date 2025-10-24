@@ -22,6 +22,7 @@ def read_better(file):
             atom_positions = lines[index1:index2]
             for atom in atom_positions:
                 data =atom.split()
+                c, x, y = float(data[1]),float(data[2]), float(data[3])
                 if x > 0.95:
                     pass 
                 elif y > 0.95:
@@ -31,7 +32,6 @@ def read_better(file):
                 elif y < -0.05:
                     pass
                 else:
-                    c, x, y = float(data[1]),float(data[2]), float(data[3])
                     set1.append([x,y])
                     nbin = 60
                     minsigma = 0.4
