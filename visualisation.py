@@ -1,5 +1,3 @@
-
-
 """
 a tool to visualise the colloids in the box like vmd 
 plots for colour reltates to size 
@@ -23,22 +21,14 @@ def read_better(file):
             for atom in atom_positions:
                 data =atom.split()
                 c, x, y = float(data[1]),float(data[2]), float(data[3])
-                if x > 0.95:
-                    pass 
-                elif y > 0.95:
-                    pass 
-                elif x < -0.05:
-                    pass
-                elif y < -0.05:
-                    pass
-                else:
-                    set1.append([x,y])
-                    nbin = 60
-                    minsigma = 0.4
-                    maxsigma = 1.6
-                    binsize = (maxsigma - minsigma) / float(nbin)
-                    sigma = minsigma + (c - 0.5) * binsize
-                    set2.append(sigma)
+                b = 0.1
+                set1.append([x,y])
+                nbin = 60
+                minsigma = 0.4
+                maxsigma = 1.6
+                binsize = (maxsigma - minsigma) / float(nbin)                 
+                sigma = minsigma + (c - 0.5) * binsize
+                set2.append(sigma)
             coordinates.append(np.array(set1, dtype=float))
             COLOUR.append(np.array(set2, dtype=float))
 
@@ -106,10 +96,18 @@ def main():
     snap= coordiantes[-1]
     x,y = snap[:,0], snap[:,1]
     Neighbors, count = Number_near_neighbout_delinea(snap)
+    b=0.05
+    mask = (x >= b) & (x <= 1 - b) & (y >= b) & (y <= 1 - b)
+
+    # Apply mask to get "interior" particles
+    X = x[mask]
+    Y = y[mask]
+    counts_inside = np.array(count)[mask]
+    color_inside = COLOUR[-1][mask]
     plt.xlabel("x coordinate")
     plt.ylabel("y coordinate")
     plt.title("Neighbor count for crystal")
-    sc = plt.scatter(x,y,c=count, marker='o', s=COLOUR[-1]*20)
+    sc = plt.scatter(X,Y,c=counts_inside, marker='o', s=color_inside*20,vmin=2, vmax=8)
     cbar = plt.colorbar(sc)
     cbar.set_label("number of nearest neighbours")
     plt.tight_layout()
