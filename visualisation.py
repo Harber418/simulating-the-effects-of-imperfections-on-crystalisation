@@ -78,11 +78,14 @@ def size():
 
 
     x,y = snap[:,0], snap[:,1]
+    mean_sigma = np.mean(COLOUR[-1])
+    std_sigma = np.std(COLOUR[-1])
+    PD = 100 * std_sigma / mean_sigma
     scatter_plot = plt.scatter(x , y,c=COLOUR[-1],marker='o',cmap='jet',s=COLOUR[-1]*20, vmin=0.54, vmax=1.4)
     
     plt.xlabel("position x ")
     plt.ylabel("position y ")
-    plt.title("Colloid crystal (polydispersity 14.73%)")
+    plt.title(f"Colloid crystal (polydispersity {PD:.2f}%)")
     cbar = plt.colorbar(scatter_plot)
     cbar.set_label("size of particles")
 
