@@ -114,23 +114,36 @@ def psi_six_global(local,N):
     return psi
 
 def psi_plot():
+    #read data 
     coordiantes, COLOUR = read_better("dump.LJ")
     snap= coordiantes[-1]
     nn, cc = Number_near_neighbout_delinea(snap)
     anlge_input = angles_for_NN(snap, nn)
     N = len(snap)
+    #calc psi 6 
     psi= psi_six_local_order(anlge_input)
     global_psi = psi_six_global(psi,N)
     x,y = snap[:,0], snap[:,1]
+    #measure pd 
     mean_sigma = np.mean(COLOUR[-1])
     std_sigma = np.std(COLOUR[-1])
     PD = 100 * std_sigma / mean_sigma
-    scatter_plot = plt.scatter(x , y,c=psi,marker='o',cmap='jet',s=COLOUR[-1]*20, vmin=0.45, vmax=0.93)
+    
+    b=0.05
+    mask = (x >= b) & (x <= 1 - b) & (y >= b) & (y <= 1 - b)
+
+    # Apply mask to get "interior" particles
+    X = x[mask]
+    Y = y[mask]
+    psi = psi[mask]
+    color_inside = COLOUR[-1][mask]
+    
+    scatter_plot = plt.scatter(X , Y,c=np.abs(psi),marker='o',cmap='Wistia',s=color_inside*20, vmin=0.3, vmax=0.93)
     plt.xlabel("position x ")
     plt.ylabel("position y ")
     plt.title(f"Colloid crystal Psi6 global = {global_psi:.3f} (polydispersity {PD:.2f}%)")
     cbar = plt.colorbar(scatter_plot)
-    cbar.set_label("size of particles")
+    cbar.set_label("Local psi 6 ")
 
     plt.tight_layout()
     plt.show() 
