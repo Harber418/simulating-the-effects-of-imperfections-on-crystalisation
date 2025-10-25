@@ -71,6 +71,72 @@ def Number_near_neighbout_delinea(coordinates):
     count = [len(s) for s in neighbours]
     return neighbours, count
 
+def angles_for_NN(coordinates, neighbors):
+    angles =[]
+    for i in range(len(coordinates)):
+        #for each atom find the 5 angles that make up the hexagonal strucutre and add it to a list  
+        #atom i
+        xi, yi = coordinates[i]
+        # near neiborours for atom i (already sorted)
+        Nn = np.array(coordinates[neighbors[i]], dtype=float)
+        #compure vecotrs from atom i to near neibours 
+        #and normalise 
+        vectors = Nn - np.array([xi,yi], dtype=float)
+        norms = np.linalg.norm(vectors,axis=1, keepdims=True)
+        norms[norms == 0] = 1.0 
+        vectors = vectors /norms
+
+        #now compute all 6 anlges around one atom  
+        angles_for_atomi =[]
+        for A in vectors:
+            theta = np.arctan2(A[1], A[0]) 
+            angles_for_atomi.append(theta)
+        # append atom i's 6 angle to a master list for all atoms 
+        angles.append(angles_for_atomi)
+    return angles
+
+
+def psi_six_local_order(angles):
+    "takes angles and nearest neighbour and returns psi 6 value"
+    psi = []
+    for angle_list in angles:
+        psi_i = 0 
+        for x in angle_list: 
+            exponential = np.exp(6j*x)
+            psi_i += exponential
+        psi.append(psi_i/len(angle_list))
+
+    return np.array(psi)
+
+def psi_six_global(local,N):
+    "golbal version "
+    psi = np.abs(np.mean(local))
+    return psi
+
+def psi_plot():
+    coordiantes, COLOUR = read_better("dump.LJ")
+    snap= coordiantes[-1]
+    nn, cc = Number_near_neighbout_delinea(snap)
+    anlge_input = angles_for_NN(snap, nn)
+    N = len(snap)
+    psi= psi_six_local_order(anlge_input)
+    global_psi = psi_six_global(psi,N)
+    x,y = snap[:,0], snap[:,1]
+    mean_sigma = np.mean(COLOUR[-1])
+    std_sigma = np.std(COLOUR[-1])
+    PD = 100 * std_sigma / mean_sigma
+    scatter_plot = plt.scatter(x , y,c=psi,marker='o',cmap='jet',s=COLOUR[-1]*20, vmin=0.45, vmax=0.93)
+    plt.xlabel("position x ")
+    plt.ylabel("position y ")
+    plt.title(f"Colloid crystal Psi6 global = {global_psi:.3f} (polydispersity {PD:.2f}%)")
+    cbar = plt.colorbar(scatter_plot)
+    cbar.set_label("size of particles")
+
+    plt.tight_layout()
+    plt.show() 
+
+
+
 
 def size():
     coordiantes, COLOUR = read_better("dump.LJ")
@@ -93,6 +159,7 @@ def size():
     plt.show() 
     
 def main():
+    psi_plot()
     size()
     
     coordiantes, COLOUR = read_better("dump.LJ")
