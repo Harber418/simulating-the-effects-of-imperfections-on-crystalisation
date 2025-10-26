@@ -110,7 +110,7 @@ def psi_six_local_order(angles):
 
 def psi_six_global(local,N):
     "golbal version "
-    psi = np.abs(np.mean(local))
+    psi = np.mean(np.abs(local))
     return psi
 
 def psi_plot():
