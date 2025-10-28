@@ -11,7 +11,7 @@ def read_better(file):
     coordinates=[]
     with open("dump.LJ", "r") as f:
         lines =f.readlines()
-        for i in range(1,102):
+        for i in range(1,107):
             index1 = i*1009 +9 
             index2 = index1 + 1000
             set1 = []
@@ -19,15 +19,8 @@ def read_better(file):
             for atom in atom_positions:
                 data =atom.split()
                 x, y = float(data[2]), float(data[3])
-                if x > 0.95:
-                    pass 
-                elif y > 0.95:
-                    pass 
-                elif x < -0.05:
-                    pass
-                elif y < -0.05:
-                    pass
-                set1.append([x,y])
+                if 0.1 <= x <= 0.9 and 0.1 <= y <= 0.9:
+                    set1.append([x,y])
             coordinates.append(np.array(set1, dtype=float))
             
     return np.array(coordinates, dtype=object)
@@ -178,13 +171,25 @@ def vmd_file_wrier(coordinates, count):
         for i , (x,y) in enumerate(coordinates):
             atom_type = count[i]  
             f.write(f"{i} {atom_type} {x:.7f} {y:.7f} 0.5\n")
-    
-def plot(coordinates):
-    """
-    plot of psi 6 over interations of lammps simulation 
-    """
-    psi_per_time=[]
 
+def redisdulas(time_step):
+    "r = psi(t) - psi(t-1)  || this is the result of np.diff"
+    time_step = np.array(time_step)
+    r = np.diff(time_step, axis=0)
+    plt.plot(r)
+    plt.xlabel("iterations of lammps simulation")
+    plt.ylabel("residual value")
+    plt.title("residual plot for psi 6 simulation")
+
+    plt.show()
+
+	
+
+def main():
+    coordinates = read_better("dump.LJ")
+
+    limit = scale_limit(coordinates[-1])
+    psi_per_time =[]
     for i in range(len(coordinates)):
         start=time.time()
 
@@ -200,24 +205,6 @@ def plot(coordinates):
         end = time.time()
         elapsed = end - start
         print(f" psi 6 is {psi_global2:.4f}, time taken {elapsed:.2f} seconds")
-        return psi_per_time
-
-def redisdulas(time_step):
-    "r = psi(t) - psi(t-1)  || this is the result of np.diff"
-    time_step = np.array(time_step)
-    r = np.diff(time_step, axis=0)
-    plt.plot(r)
-    plt.xlabel("iterations of lammps simulation")
-    plt.ylabel("residual value")
-    plt.title("residual plot for psi 6 simulation")
-
-    plt.show()
-
-def main():
-    coordinates = read_better("dump.LJ")
-
-    limit = scale_limit(coordinates[-1])
-    psi_per_time = plot(coordinates)
     #results for the last time step taken seperatly     
     near_neighbours, count = Number_near_neighbour(coordinates[-1], limits=limit)
     nn, cc = Number_near_neighbout_delinea(coordinates[-1])
@@ -239,8 +226,10 @@ def main():
     psi_global3 = psi_six_global2(psi2,N)
     print(f"the delinea psi is {psi_global3}")
 
-
+    redisdulas(psi_per_time)
     # plot for elequilibriation 
+    vmd_file_wrier(coordinates[-1],count)
+    print(f"written file vmd_input.xyz ")
 
     x = np.arange(len(psi_per_time))
 
@@ -249,9 +238,6 @@ def main():
     plt.ylabel("psi 6")
     plt.title("Plot")
     plt.show() 
-    # residulas plot 
-    redisdulas(psi_per_time)
-
     #print(f"The Psi 6 local value is {np.abs(psi)}")
 
     print("-----------------------------")
