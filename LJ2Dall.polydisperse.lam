@@ -1,0 +1,70 @@
+####
+# Combined 2D equilibration + production run
+###
+
+units lj
+dimension 2
+atom_style atomic
+
+boundary p p p
+
+###
+# Neighbors
+###
+neighbor 1.9 bin
+neigh_modify every 1 delay 1 check yes
+
+###
+# Read initial configuration (generated with Python or Fortran script)
+###
+read_data lammps_input_pd
+
+reset_timestep 0
+
+###
+# Define groups (all atoms)
+###
+#group all type *
+
+###
+# Dumps
+###
+dump   id all atom 10000 dump.LJ
+
+###################################################################
+# EQUILIBRATION STAGE
+# Using "soft" potential to relax overlaps
+###################################################################
+
+pair_style soft 1.12246152962189
+
+include pair.polydisperse.equilibration
+
+fix 1 all nve
+fix 2 all langevin 1.0 1.0 1.0 31
+fix 3 all enforce2d
+
+thermo 1000
+thermo_style custom step temp epair press pxx pyy vol
+
+timestep 0.01
+run 250000   # short soft push to relax
+
+###################################################################
+# PRODUCTION STAGE
+# Switch to Lennard-Jones interactions
+###################################################################
+
+pair_style lj/cut 1.12246152962189
+pair_modify shift yes
+
+#pair_coeff 1 1 1.0 1.0 1.12246152962189
+include pair.polydisperse
+
+thermo 10000
+thermo_style custom step temp epair press pxx pyy vol
+
+timestep 0.01
+run 1000000   # production run
+
+
