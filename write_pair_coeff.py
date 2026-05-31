@@ -41,3 +41,23 @@ with open("pair.polydisperse.equilibration", "w") as f:
     f.write("\n".join(pair_lines) + "\n")
 
 print(" Pair coefficients written to 'pair.polydisperse.equilibration'")
+
+#Writing the coefficients for the attractive stage. 
+#we need to vary epsilon but reasonable values should be 1 and 5 
+
+epsilon_attractive = 1.0   # EXPERIMENTAL PARAMETER
+attractive_cutoff_factor = 2.5   # extend beyond the WCA point to include the well
+
+pair_lines = []
+for i in range(ntype):
+    for j in range(i, ntype):
+        sigma = 0.5 * (sizes[i] + sizes[j])
+        cutoff = attractive_cutoff_factor * sigma
+        pair_lines.append(
+            f"pair_coeff {i+1} {j+1} {epsilon_attractive:.6f} {sigma:.6f} {cutoff:.6f}"
+        )
+
+with open("pair.polydisperse.attractive", "w") as f:
+    f.write("\n".join(pair_lines) + "\n")
+
+print(f"Attractive pair coefficients written (epsilon={epsilon_attractive})")

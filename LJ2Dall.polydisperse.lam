@@ -2,16 +2,21 @@
 # Combined 2D equilibration + production run
 ###
 
-units lj
-dimension 2
-atom_style atomic
+units lj 
+#dimensionless
 
-boundary p p p
+dimension 2
+atom_style atomic 
+#only stores values for type position velocity 
+
+#periodic boundary conditions
+boundary p p p 
 
 ###
 # Neighbors
 ###
-neighbor 1.9 bin
+#only hold a list of near neighbour interactions not all 1xN interactions for each particle
+neighbor 2.5 bin
 neigh_modify every 1 delay 1 check yes
 
 ###
@@ -66,5 +71,22 @@ thermo_style custom step temp epair press pxx pyy vol
 
 timestep 0.01
 run 1000000   # production run
+
+###################################################################
+# CAPILLARY ATTRACTION STAGE
+# Mimics meniscus-induced attraction as solvent level drops
+# Run AFTER production stage has equilibrated
+###################################################################
+
+pair_style lj/cut 4
+pair_modify shift no
+include pair.polydisperse.attractive
+
+# Keep the same thermostat and integrator fixes (1, 2, 3 are still active)
+
+thermo 10000
+thermo_style custom step temp epair press pxx pyy vol
+timestep 0.01
+run 250000   # 2500 time units 
 
 
