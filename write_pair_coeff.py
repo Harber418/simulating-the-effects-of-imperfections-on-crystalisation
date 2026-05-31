@@ -45,7 +45,7 @@ print(" Pair coefficients written to 'pair.polydisperse.equilibration'")
 #Writing the coefficients for the attractive stage. 
 #we need to vary epsilon but reasonable values should be 1 and 5 
 
-epsilon_attractive = 1.0   # EXPERIMENTAL PARAMETER
+epsilon_attractive = 5.0   # EXPERIMENTAL PARAMETER
 attractive_cutoff_factor = 2.5   # extend beyond the WCA point to include the well
 
 pair_lines = []

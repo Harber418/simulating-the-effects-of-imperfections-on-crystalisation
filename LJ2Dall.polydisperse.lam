@@ -16,7 +16,7 @@ boundary p p p
 # Neighbors
 ###
 #only hold a list of near neighbour interactions not all 1xN interactions for each particle
-neighbor 2.5 bin
+neighbor 1.9 bin
 neigh_modify every 1 delay 1 check yes
 
 ###
@@ -70,7 +70,7 @@ thermo 10000
 thermo_style custom step temp epair press pxx pyy vol
 
 timestep 0.01
-run 1000000   # production run
+run 2000000   # production run
 
 ###################################################################
 # CAPILLARY ATTRACTION STAGE
@@ -78,7 +78,7 @@ run 1000000   # production run
 # Run AFTER production stage has equilibrated
 ###################################################################
 
-pair_style lj/cut 4
+pair_style lj/cut 2.5
 pair_modify shift no
 include pair.polydisperse.attractive
 
@@ -87,6 +87,6 @@ include pair.polydisperse.attractive
 thermo 10000
 thermo_style custom step temp epair press pxx pyy vol
 timestep 0.01
-run 250000   # 2500 time units 
+run 50000   # 500 time units 
 
 
