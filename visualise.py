@@ -6,6 +6,41 @@ plot for colour relates to number of nearest neighbours
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import Delaunay
+def read_last(file):
+    
+    nbin = 60
+    minsigma = 0.4
+    maxsigma = 1.6
+    binsize = (maxsigma - minsigma) / float(nbin)
+
+    with open(file, "r") as f:
+        lines = f.readlines()
+
+    # Find the LAST occurrence of "ITEM: ATOMS"
+    last_idx = None
+    for i in range(len(lines) - 1, -1, -1):
+        if lines[i].strip() == "ITEM: ATOMS id type xs ys zs":
+            last_idx = i + 1
+            break
+
+    if last_idx is None:
+        raise ValueError("No atom data found in dump file")
+
+    set1 = []
+    set2 = []
+    i = last_idx
+    while i < len(lines) and not lines[i].startswith("ITEM:"):
+        data = lines[i].split()
+        c = float(data[1])
+        x = float(data[2])
+        y = float(data[3])
+        sigma = minsigma + (c - 0.5) * binsize
+        set1.append([x, y])
+        set2.append(sigma)
+        i += 1
+
+    return np.array(set1, dtype=float), np.array(set2, dtype=float)
+
 
 def read_better(file):
     coordinates=[]
@@ -115,8 +150,9 @@ def psi_six_global(local,N):
 
 def psi_plot():
     #read data 
-    coordiantes, COLOUR = read_better("dump.LJ")
-    snap= coordiantes[-1]
+    #coordiantes, COLOUR = read_better("dump.LJ")
+    #snap= coordiantes[-1]
+    snap, COLOUR = read_last("dump.LJ")
     nn, cc = Number_near_neighbout_delinea(snap)
     anlge_input = angles_for_NN(snap, nn)
     N = len(snap)
@@ -125,8 +161,8 @@ def psi_plot():
     global_psi = psi_six_global(psi,N)
     x,y = snap[:,0], snap[:,1]
     #measure pd 
-    mean_sigma = np.mean(COLOUR[-1])
-    std_sigma = np.std(COLOUR[-1])
+    mean_sigma = np.mean(COLOUR)
+    std_sigma = np.std(COLOUR)
     PD = 100 * std_sigma / mean_sigma
     
     b=0.05
@@ -136,7 +172,7 @@ def psi_plot():
     X = x[mask]
     Y = y[mask]
     psi = psi[mask]
-    color_inside = COLOUR[-1][mask]
+    color_inside = COLOUR[mask]
     
     scatter_plot = plt.scatter(X , Y,c=np.abs(psi),marker='o',cmap='Wistia',s=color_inside*20, vmin=0.3, vmax=0.93)
     plt.xlabel("position x ")
@@ -152,15 +188,15 @@ def psi_plot():
 
 
 def size():
-    coordiantes, COLOUR = read_better("dump.LJ")
-    snap= coordiantes[-1]
-
+    #coordiantes, COLOUR = read_better("dump.LJ")
+    #snap= coordiantes[-1]
+    snap, COLOUR = read_last("dump.LJ")
 
     x,y = snap[:,0], snap[:,1]
-    mean_sigma = np.mean(COLOUR[-1])
-    std_sigma = np.std(COLOUR[-1])
+    mean_sigma = np.mean(COLOUR)
+    std_sigma = np.std(COLOUR)
     PD = 100 * std_sigma / mean_sigma
-    scatter_plot = plt.scatter(x , y,c=COLOUR[-1],marker='o',cmap='jet',s=COLOUR[-1]*20, vmin=0.54, vmax=1.4)
+    scatter_plot = plt.scatter(x , y,c=COLOUR,marker='o',cmap='jet',s=COLOUR[-1]*20, vmin=0.54, vmax=1.4)
     
     plt.xlabel("position x ")
     plt.ylabel("position y ")
@@ -175,8 +211,9 @@ def main():
     psi_plot()
     size()
     
-    coordiantes, COLOUR = read_better("dump.LJ")
-    snap= coordiantes[-1]
+    #coordiantes, COLOUR = read_better("dump.LJ")
+    #snap= coordiantes[-1]
+    snap, COLOUR = read_last("dump.LJ")
     x,y = snap[:,0], snap[:,1]
     Neighbors, count = Number_near_neighbout_delinea(snap)
     b=0.05
@@ -186,7 +223,7 @@ def main():
     X = x[mask]
     Y = y[mask]
     counts_inside = np.array(count)[mask]
-    color_inside = COLOUR[-1][mask]
+    color_inside = COLOUR[mask]
     plt.xlabel("x coordinate")
     plt.ylabel("y coordinate")
     plt.title("Neighbor count for crystal")

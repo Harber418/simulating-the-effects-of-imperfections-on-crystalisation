@@ -121,4 +121,4 @@ def generate_lammps(lx=30, ly=30, nbead=1000, seed=17764,
 
 if __name__ == "__main__":
     #this is where changes are made
-    generate_lammps(lx=30,ly=30, mean=1.0, sd=0.087, filename="lammps_input_pd", statsfile="type_stats.txt")
+    generate_lammps(lx=30.3,ly=30.3, mean=1.0, sd=0.087, filename="lammps_input_pd", statsfile="type_stats.txt")
