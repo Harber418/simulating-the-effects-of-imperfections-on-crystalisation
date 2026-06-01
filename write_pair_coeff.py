@@ -7,7 +7,10 @@ def Pair_coeffecients(epsilon=1, ntype=60,sizes=[],cut_factor=(2 ** (1 / 6)),fil
         for j in range(i, ntype):
             sigma = 0.5 * (sizes[i] + sizes[j])
             cutoff = cut_factor * sigma
-            pair_lines.append(f"pair_coeff {i+1} {j+1} {epsilon:.6f} {sigma:.6f} {cutoff:.6f}")
+            if filename == "pair.polydisperse.equilibration":
+                pair_lines.append(f"pair_coeff {i+1} {j+1} {epsilon:.6f} {cutoff:.6f}")
+            else:
+                pair_lines.append(f"pair_coeff {i+1} {j+1} {epsilon:.6f} {sigma:.6f} {cutoff:.6f}")
 
     # Write all coefficients to file
     with open(filename, "w") as f:
@@ -36,7 +39,7 @@ def main():
     #equilibration for attractive step 
     Pair_coeffecients(sizes=size,cut_factor=1.3,filename = "pair.polydisperse.attractive.equilibration")
     #attractive step
-    Pair_coeffecients(epsilon=5,sizes=size,cut_factor=1.3,filename = "pair.polydisperse.attractive")
+    Pair_coeffecients(epsilon=2.5,sizes=size,cut_factor=1.3,filename = "pair.polydisperse.attractive")
 
 
 if __name__ == "__main__":

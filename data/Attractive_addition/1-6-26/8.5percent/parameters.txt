@@ -1,0 +1,3 @@
+1 million production setsp 
+epsilon is 2 and range is 1.3
+wiht 250000 steps 
