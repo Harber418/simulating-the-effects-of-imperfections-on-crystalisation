@@ -42,33 +42,15 @@ def read_last(file):
     return np.array(set1, dtype=float), np.array(set2, dtype=float)
 
 
-def read_better(file):
-    coordinates=[]
-    COLOUR=[]
-    with open("dump.LJ", "r") as f:
-        lines =f.readlines()
-        for i in range(1,102):
-            index1 = i*1009 +9 
-            index2 = index1 + 1000
-            set1 = []
-            set2 = []
-            atom_positions = lines[index1:index2]
-            for atom in atom_positions:
-                data =atom.split()
-                c, x, y = float(data[1]),float(data[2]), float(data[3])
-                b = 0.1
-                set1.append([x,y])
-                nbin = 60
-                minsigma = 0.4
-                maxsigma = 1.6
-                binsize = (maxsigma - minsigma) / float(nbin)                 
-                sigma = minsigma + (c - 0.5) * binsize
-                set2.append(sigma)
-            coordinates.append(np.array(set1, dtype=float))
-            COLOUR.append(np.array(set2, dtype=float))
+def save_data(file):
+    snap, COLOUR = read_last("dump.LJ")
+    #we want to save the last data so that we can read it later
+    #as each dump.LJ is 5 MB we want to reduce this for larger data collection. 
+    with open(file, "a") as f:
+        f.write("sigma, x , y")
+        for step, (M, E) in enumerate(zip(snap, COLOUR)):
+            f.write(f"{E},{M[0]},{M[1]}\n")
 
-            
-    return np.array(coordinates, dtype=object), COLOUR
 
 
 def Number_near_neighbout_delinea(coordinates):
