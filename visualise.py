@@ -47,7 +47,7 @@ def save_data(file):
     #we want to save the last data so that we can read it later
     #as each dump.LJ is 5 MB we want to reduce this for larger data collection. 
     with open(file, "a") as f:
-        f.write("sigma, x , y")
+        f.write("sigma, x , y\n")
         for step, (M, E) in enumerate(zip(snap, COLOUR)):
             f.write(f"{E},{M[0]},{M[1]}\n")
 
@@ -190,6 +190,9 @@ def size():
     plt.show() 
     
 def main():
+    filename= "attraction.txt" 
+    save_data(filename) #here we generate the data from a lammps file 
+    #so if you want to look at old data.
     psi_plot()
     size()
     
