@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def generate_lammps(lx=30, ly=30, nbead=1000, seed=97336,
+def generate_lammps(lx=30, ly=30, nbead=1000, seed=9973663,
                     mean=1.0, sd=0.1, filename="lammps_pd.data",
                     statsfile="type_stats.txt", make_plot=True):
     """
@@ -121,4 +121,4 @@ def generate_lammps(lx=30, ly=30, nbead=1000, seed=97336,
 
 if __name__ == "__main__":
     #this is where changes are made
-    generate_lammps(lx=30,ly=30, mean=1.0, sd=0.086, filename="lammps_input_pd", statsfile="type_stats.txt")
+    generate_lammps(lx=30,ly=30, mean=1.0, sd=0.087, filename="lammps_input_pd", statsfile="type_stats.txt")
