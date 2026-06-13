@@ -20,13 +20,13 @@ from visualise import organise_and_plot
 def main():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser()
-    parser.add_argument('-L', '--size', type=float, default=30.3, help='System size (default: 30)')
-    parser.add_argument('-P', '--polydispersity', type=float, default=9, help='polydispersity (default: 9%)')
-    parser.add_argument('-E', '--epsilon', type=float, default=1, help='attractive constant (default: 1)')
-    parser.add_argument('-c', '--cut_off', type=float, default='1.5', help="size of cutoff for attractive tail (default: '1.5')")
+    parser.add_argument('-L', '--size', type=float, default=30, help='System size (default: 30)')
+    parser.add_argument('-P', '--polydispersity', type=float, default=9.6, help='polydispersity (default: 9%)')
+    parser.add_argument('-E', '--epsilon', type=float, default=2, help='attractive constant (default: 1)')
+    parser.add_argument('-c', '--cut_off', type=float, default=1.4, help="size of cutoff for attractive tail (default: '1.5')")
     parser.add_argument('-a', '--attractive', type=bool, default=True, help="do you want to add the attractive stage to the simulation (default: True)")
-    parser.add_argument('-i', '--iterations', type=int, default=1000000, help="how long should the production stage be (default: 1000000)")
-    parser.add_argument('-I', '--attractive_itterations', type=int, default=250000, help="how long should the attractive production stage be (default: 250000)")
+    parser.add_argument('-i', '--iterations', type=int, default=1500000, help="how long should the production stage be (default: 1000000)")
+    parser.add_argument('-I', '--attractive_itterations', type=int, default=100000, help="how long should the attractive production stage be (default: 250000)")
     parser.add_argument('-t', '--timestep', type=float, default=0.01, help="timestep for attractive term, used if forces are too large leading to errors (default: 0.01)")
 
     args = parser.parse_args()
@@ -47,7 +47,7 @@ def main():
     size = np.array([minsigma + (i + 0.5) * binsize for i in range(ntype)])
 
     # WCA cutoff factor
-    cut_factor = 2 ** (1 / 6)
+    cut_factor = 2 ** (1 / 6) #1.12246
     print(cut_factor)
     #produces equilibriation step 
     Pair_coeffecients(epsilon=100,sizes=size,filename="pair.polydisperse.equilibration")
@@ -61,15 +61,17 @@ def main():
     
     #==============================================================================================================================
     #write the lammps file 
-    write_lammps(attraction=args.attractive,main_iterations=args.iterations,attraction_iterations=args.attractive_itterations,cut_off=args.cut_off,timestep=args.timestep)
+    write_lammps(attraction=args.attractive,main_iterations=args.iterations,attraction_iterations=args.attractive_itterations,cut_off=args.cut_off*1.3,timestep=args.timestep)
     
     #================================================================================================================================
     #run the lammps simulation 
+    print("running lammps simulation please wait")
+    print("this may take up to 10 minutes depending on choosen parameters")
     run_lammps(filename="LJ2Dall.polydisperse.lam", lammps_exe="lmp")
+
     #=================================================================================
     #now we want to save the images for each stage of production to add validity to the process
-    
-    organise_and_plot(output_dir=f"results_PD{args.polydispersity}_eps{args.epsilon}")
+    organise_and_plot(output_dir=f"results_PD{args.polydispersity}_epsilon{args.epsilon}_size{args.size}_cutoff{args.cut_off}")
 
 
 if __name__ == "__main__":

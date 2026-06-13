@@ -1,0 +1,40 @@
+units lj
+dimension 2 
+ atom_style atomic 
+boundary p p p 
+neighbor 1.9 bin
+neigh_modify every 1 delay 1 check yes 
+read_data lammps_input_pd
+reset_timestep 0
+pair_style soft 1.12246152962189
+include pair.polydisperse.equilibration
+fix 1 all nve
+fix 2 all langevin 1.0 1.0 1.0 31
+fix 3 all enforce2d
+thermo 1000
+thermo_style custom step temp epair press pxx pyy vol
+timestep 0.01
+run 250000
+write_dump all atom equil_positions.dump
+pair_style lj/cut 1.12246152962189
+pair_modify shift yes
+include pair.polydisperse
+thermo 10000
+thermo_style custom step temp epair press pxx pyy vol
+timestep 0.01
+run 1500000
+write_dump all atom production_positions.dump
+pair_style lj/cut 1.8199999999999998
+pair_modify shift no
+include pair.polydisperse.attractive.equilibration
+timestep 0.01
+run 100000
+write_dump all atom attractive_equil_positions.dump
+pair_style lj/cut 1.8199999999999998
+pair_modify shift no
+include pair.polydisperse.attractive
+thermo 10000
+thermo_style custom step temp epair press pxx pyy vol
+timestep 0.01
+run 100000
+write_dump all atom attractive_positions.dump
