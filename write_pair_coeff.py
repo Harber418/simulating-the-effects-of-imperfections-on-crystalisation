@@ -38,9 +38,9 @@ def main():
     #Produces production step
     Pair_coeffecients(sizes=size)
     #equilibration for attractive step 
-    Pair_coeffecients(sizes=size,cut_factor=1.15,filename = "pair.polydisperse.attractive.equilibration")
+    Pair_coeffecients(sizes=size,cut_factor=1.5,filename = "pair.polydisperse.attractive.equilibration")
     #attractive step
-    Pair_coeffecients(epsilon=3,sizes=size,cut_factor=1.15,filename = "pair.polydisperse.attractive")
+    Pair_coeffecients(epsilon=5,sizes=size,cut_factor=1.5,filename = "pair.polydisperse.attractive")
 
 
 if __name__ == "__main__":
