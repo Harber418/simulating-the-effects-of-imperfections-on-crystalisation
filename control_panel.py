@@ -15,7 +15,7 @@ from Generate_lammps_area_corrected import generate_lammps
 from write_pair_coeff import Pair_coeffecients
 from write_lammps_input_file import write_lammps
 from running_sim import run_lammps
-
+from visualise import organise_and_plot
 
 def main():
     """Parse command line arguments"""
@@ -61,11 +61,16 @@ def main():
     
     #==============================================================================================================================
     #write the lammps file 
-    write_lammps(attraction=args.attractive,main_iterations=args.i,attraction_iterations=args.I,cut_off=args.cut_off,timestep=args.timestep)
+    write_lammps(attraction=args.attractive,main_iterations=args.iterations,attraction_iterations=args.attractive_itterations,cut_off=args.cut_off,timestep=args.timestep)
     
     #================================================================================================================================
     #run the lammps simulation 
-    run_lammps(filename="LJ2Dall.polydisperse.lam")
+    run_lammps(filename="LJ2Dall.polydisperse.lam", lammps_exe="lmp")
+    #=================================================================================
+    #now we want to save the images for each stage of production to add validity to the process
+    
+    organise_and_plot(output_dir=f"results_PD{args.polydispersity}_eps{args.epsilon}")
+
 
 if __name__ == "__main__":
     main()

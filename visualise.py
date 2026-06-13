@@ -6,6 +6,9 @@ plot for colour relates to number of nearest neighbours
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import Delaunay
+import os
+import shutil
+
 def read_last(file):
     
     nbin = 60
@@ -130,44 +133,72 @@ def psi_six_global(local,N):
     psi = np.mean(np.abs(local))
     return psi
 
-def psi_plot():
-    #read data 
-    #coordiantes, COLOUR = read_better("dump.LJ")
-    #snap= coordiantes[-1]
-    snap, COLOUR = read_last("dump.LJ")
+def psi_plot(filename="dump.LJ", save_path=None):
+    snap, COLOUR = read_last(filename)
     nn, cc = Number_near_neighbout_delinea(snap)
-    anlge_input = angles_for_NN(snap, nn)
+    angle_input = angles_for_NN(snap, nn)
     N = len(snap)
-    #calc psi 6 
-    psi= psi_six_local_order(anlge_input)
-    global_psi = psi_six_global(psi,N)
-    x,y = snap[:,0], snap[:,1]
-    #measure pd 
+
+    psi = psi_six_local_order(angle_input)
+    global_psi = psi_six_global(psi, N)
+    x, y = snap[:, 0], snap[:, 1]
+
     mean_sigma = np.mean(COLOUR)
     std_sigma = np.std(COLOUR)
     PD = 100 * std_sigma / mean_sigma
-    
-    b=0.05
-    mask = (x >= b) & (x <= 1 - b) & (y >= b) & (y <= 1 - b)
 
-    # Apply mask to get "interior" particles
-    X = x[mask]
-    Y = y[mask]
+    b = 0.05
+    mask = (x >= b) & (x <= 1 - b) & (y >= b) & (y <= 1 - b)
+    X, Y = x[mask], y[mask]
     psi = psi[mask]
     color_inside = COLOUR[mask]
-    
-    scatter_plot = plt.scatter(X , Y,c=np.abs(psi),marker='o',cmap='Wistia',s=color_inside*20, vmin=0.3, vmax=0.93)
-    plt.xlabel("position x ")
-    plt.ylabel("position y ")
-    plt.title(f"Colloid crystal Psi6 global = {global_psi:.3f} (polydispersity {PD:.2f}%)")
-    cbar = plt.colorbar(scatter_plot)
-    cbar.set_label("Local psi 6 ")
 
+    fig, ax = plt.subplots()
+    scatter_plot = ax.scatter(X, Y, c=np.abs(psi), marker='o', cmap='Wistia',
+                               s=color_inside*20, vmin=0.3, vmax=0.93)
+    ax.set_xlabel("position x")
+    ax.set_ylabel("position y")
+    ax.set_title(f"Psi6 global = {global_psi:.3f} (polydispersity {PD:.2f}%)")
+    cbar = fig.colorbar(scatter_plot)
+    cbar.set_label("Local psi 6")
     plt.tight_layout()
-    plt.show() 
+
+    if save_path:
+        fig.savefig(save_path, dpi=150)
+        plt.close(fig)
+    else:
+        plt.show()
 
 
+def organise_and_plot(dump_files=None, output_dir="results"):
+    """
+    Moves the given dump files into output_dir and saves a psi6 plot for each.
+    """
+    if dump_files is None:
+        dump_files = [
+            "equil_positions.dump",
+            "production_positions.dump",
+            "attractive_equil_positions.dump",
+            "attractive_positions.dump",
+        ]
 
+    os.makedirs(output_dir, exist_ok=True)
+
+    for dump_file in dump_files:
+        if not os.path.exists(dump_file):
+            print(f"Warning: {dump_file} not found, skipping.")
+            continue
+
+        # Generate the psi6 plot BEFORE moving the file
+        stage_name = os.path.splitext(dump_file)[0]
+        plot_path = os.path.join(output_dir, f"{stage_name}_psi6.png")
+        psi_plot(filename=dump_file, save_path=plot_path)
+        print(f"Saved plot: {plot_path}")
+
+        # Move the dump file into the results folder
+        dest = os.path.join(output_dir, dump_file)
+        shutil.move(dump_file, dest)
+        print(f"Moved {dump_file} -> {dest}")
 
 def size():
     #coordiantes, COLOUR = read_better("dump.LJ")
