@@ -26,7 +26,7 @@ def write_lammps(attraction: bool = True, main_iterations: int = 1000000,
         f.write("fix 1 all nve\nfix 2 all langevin 1.0 1.0 1.0 31\nfix 3 all enforce2d\n")
         f.write("thermo 1000\n")
         f.write("thermo_style custom step temp epair press pxx pyy vol\n")
-        f.write("timestep 0.01\nrun 250000\n")
+        f.write("timestep 0.01\nrun 500000\n")
         f.write("write_dump all atom equil_positions.dump\n")
 
         # production stage

@@ -76,7 +76,9 @@ def Number_near_neighbout_delinea(coordinates):
     tri_radii = np.asarray([circumradius(coordinates[t,:]) for t in triangles])
     med_radius = np.median(tri_radii)
     thres *= med_radius
+    print(f"the threashhold for delaunay is = {thres}")
     triangles = triangles[tri_radii < thres]
+    #print(triangles)
 
     # Create the neighbour lists - only consider the filtered triangles based on
     # the threshold on circumradius
@@ -166,6 +168,7 @@ def psi_plot(filename="dump.LJ", save_path=None):
     if save_path:
         fig.savefig(save_path, dpi=150)
         plt.close(fig)
+        colloidal_distance(snap)
     else:
         plt.show()
 
@@ -199,6 +202,25 @@ def organise_and_plot(dump_files=None, output_dir="results"):
         dest = os.path.join(output_dir, dump_file)
         shutil.move(dump_file, dest)
         print(f"Moved {dump_file} -> {dest}")
+
+def colloidal_distance(coordinates):
+
+    neighbours, count = Number_near_neighbout_delinea(coordinates)
+
+    distances = []
+
+    for i, neighs in enumerate(neighbours):
+        for j in neighs:
+            if j > i:  # avoid double counting
+                d = np.linalg.norm(coordinates[i] - coordinates[j])
+                distances.append(d)
+
+    distances = np.array(distances)
+
+    plt.hist(distances, bins=100)
+    plt.xlabel("Neighbour distance")
+    plt.ylabel("Count")
+    plt.show()
 
 def size():
     #coordiantes, COLOUR = read_better("dump.LJ")
