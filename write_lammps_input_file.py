@@ -45,7 +45,7 @@ def write_lammps(attraction: bool = True, main_iterations: int = 1000000,
             f.write(f"pair_style lj/cut {cut_off}\n")
             f.write("pair_modify shift no\n")
             f.write("include pair.polydisperse.attractive.equilibration\n")
-            f.write(f"timestep {timestep}\nrun 100000\n")
+            f.write(f"timestep {timestep}\nrun 250000\n")
             f.write("write_dump all atom attractive_equil_positions.dump\n")
 
             # attractive stage

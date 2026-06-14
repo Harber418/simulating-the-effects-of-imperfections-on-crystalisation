@@ -150,7 +150,7 @@ def psi_six_global(local,N):
     psi = np.mean(np.abs(local))
     return psi
 
-def psi_plot(filename="dump.LJ", save_path=None):
+def psi_plot(filename="dump.LJ", save_path=None,Phase = True):
     snap, COLOUR = read_last(filename)
     nn, cc = Number_near_neighbout_delinea(snap)
     angle_input = angles_for_NN(snap, nn)
@@ -189,7 +189,7 @@ def psi_plot(filename="dump.LJ", save_path=None):
     ax.set_xticks([])
     ax.set_yticks([])
     #ax.text(0.02,0.98,rf"$Global \phi={global_psi:.3f}$"+"\n"+rf"$Polydispersity={PD:.2f}\%$",transform=ax.transAxes,va="top")
-    ax.set_title(rf"$Global" +" "+rf"\phi:{global_psi:.3f}$"+ " "+rf"$Polydispersity:{PD:.2f}\%$")
+    ax.set_title(rf"$Global " +" "+rf"\phi:{global_psi:.3f}$"+ " "+rf"$Polydispersity:{PD:.2f}\%$")
     
     plt.tight_layout()
     if save_path:
@@ -198,6 +198,52 @@ def psi_plot(filename="dump.LJ", save_path=None):
         #colloidal_distance(snap)
     else:
         plt.show()
+
+    #
+    #add a phase diagram 
+    if Phase:
+        fig, ax = plt.subplots()
+        phase_norm = colors.Normalize(vmin=-np.pi,vmax=np.pi)
+        cmap = cm.get_cmap('turbo')
+        for xi, yi, sigma_i, psi_i in zip(X, Y, color_inside, psi):
+            phase = np.angle(psi_i)/6
+            color = plt.cm.hsv(phase_norm(phase))
+            circ = Circle((xi, yi), radius=sigma_i/2, facecolor=color, edgecolor='k',linewidth=0.1)
+            ax.add_patch(circ)
+        ax.set_aspect("equal")
+        ax.set_aspect('equal')
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+        sm = cm.ScalarMappable(
+            cmap=plt.cm.hsv,
+            norm=phase_norm
+        )
+        sm.set_array([])
+
+        cbar = fig.colorbar(sm, ax=ax)
+        cbar.set_label(r'arg($\psi_6$)')
+
+        ax.set_title(
+            rf"$Global\ \phi={global_psi:.3f}$"
+            + " "
+            + rf"$PD={PD:.2f}\%$"
+        )
+
+        plt.tight_layout()
+        root, ext = os.path.splitext(save_path)
+
+        phase_path = root + "_phase" + ext
+
+        fig.savefig(
+            phase_path,
+            dpi=300,
+            bbox_inches="tight"
+        )
+
+        print(f"Saved phase plot: {phase_path}")
+
+        plt.close(fig)
 
 def psi_plot_old(filename="dump.LJ", save_path=None):
     snap, COLOUR = read_last(filename)
@@ -251,6 +297,7 @@ def psi_plot_old(filename="dump.LJ", save_path=None):
         #colloidal_distance(snap)
     else:
         plt.show()
+    
 
 
 def organise_and_plot(dump_files=None, output_dir="results"):
@@ -282,6 +329,13 @@ def organise_and_plot(dump_files=None, output_dir="results"):
         dest = os.path.join(output_dir, dump_file)
         shutil.move(dump_file, dest)
         print(f"Moved {dump_file} to {dest}")
+        #move phase 
+        root, ext = os.path.splitext(plot_path)
+        phase_path = root + "_phase" + ext
+        phase_dest = os.path.join(output_dir, os.path.basename(phase_path))
+        shutil.move(phase_path, phase_dest)
+
+
 
 def colloidal_distance(coordinates):
 

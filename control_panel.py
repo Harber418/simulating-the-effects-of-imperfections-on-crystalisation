@@ -24,7 +24,7 @@ def main():
     parser.add_argument('-P', '--polydispersity', type=float, default=9.6, help='polydispersity (default: 9%)')
     parser.add_argument('-E', '--epsilon', type=float, default=1, help='attractive constant (default: 1)')
     parser.add_argument('-c', '--cut_off', type=float, default=1.05, help="size of cutoff for attractive tail (default: '1.5')")
-    parser.add_argument('-a', '--attractive', type=bool, default=False, help="do you want to add the attractive stage to the simulation (default: True)")
+    parser.add_argument('-a', '--attractive', type=bool, default=True, help="do you want to add the attractive stage to the simulation (default: True)")
     parser.add_argument('-i', '--iterations', type=int, default=1500000, help="how long should the production stage be (default: 1000000)")
     parser.add_argument('-I', '--attractive_itterations', type=int, default=100000, help="how long should the attractive production stage be (default: 250000)")
     parser.add_argument('-t', '--timestep', type=float, default=0.01, help="timestep for attractive term, used if forces are too large leading to errors (default: 0.01)")
@@ -54,7 +54,7 @@ def main():
     #Produces production step
     Pair_coeffecients(epsilon=10, sizes=size)
     #equilibration for attractive step 
-    Pair_coeffecients(sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive.equilibration")
+    Pair_coeffecients(epsilon=args.epsilon,sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive.equilibration")
     #attractive step
     Pair_coeffecients(epsilon=args.epsilon,sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive")
     

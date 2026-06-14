@@ -22,5 +22,19 @@ include pair.polydisperse
 thermo 10000
 thermo_style custom step temp epair press pxx pyy vol
 timestep 0.01
-run 2000000
+run 1500000
 write_dump all atom production_positions.dump
+pair_style lj/cut 1.326
+pair_modify shift no
+include pair.polydisperse.attractive.equilibration
+timestep 0.001
+run 250000
+write_dump all atom attractive_equil_positions.dump
+pair_style lj/cut 1.326
+pair_modify shift no
+include pair.polydisperse.attractive
+thermo 10000
+thermo_style custom step temp epair press pxx pyy vol
+timestep 0.001
+run 100000
+write_dump all atom attractive_positions.dump
