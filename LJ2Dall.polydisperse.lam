@@ -14,7 +14,7 @@ fix 3 all enforce2d
 thermo 1000
 thermo_style custom step temp epair press pxx pyy vol
 timestep 0.01
-run 500000
+run 250000
 write_dump all atom equil_positions.dump
 pair_style lj/cut 1.12246152962189
 pair_modify shift yes

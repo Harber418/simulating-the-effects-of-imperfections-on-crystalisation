@@ -50,9 +50,9 @@ def main():
     cut_factor = 2 ** (1 / 6) #1.12246
     print(cut_factor)
     #produces equilibriation step 
-    Pair_coeffecients(epsilon=1,sizes=size,filename="pair.polydisperse.equilibration")
+    Pair_coeffecients(epsilon=100,sizes=size,filename="pair.polydisperse.equilibration")
     #Produces production step
-    Pair_coeffecients(epsilon=100, sizes=size)
+    Pair_coeffecients(epsilon=10, sizes=size)
     #equilibration for attractive step 
     Pair_coeffecients(sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive.equilibration")
     #attractive step
@@ -71,7 +71,10 @@ def main():
 
     #=================================================================================
     #now we want to save the images for each stage of production to add validity to the process
-    organise_and_plot(output_dir=f"results_PD{args.polydispersity}_epsilon{args.epsilon}_size{args.size}_cutoff{args.cut_off}")
+    if args.attractive:
+        organise_and_plot(output_dir=f"results_PD{args.polydispersity}_size{args.size}_attractive_epsilon{args.epsilon}_cutoff{args.cut_off}")
+    else:
+        organise_and_plot(output_dir=f"results_PD{args.polydispersity}_size{args.size}")
 
 
 if __name__ == "__main__":

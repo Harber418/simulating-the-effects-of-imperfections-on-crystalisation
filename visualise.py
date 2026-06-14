@@ -10,6 +10,10 @@ from matplotlib import cm, colors
 from scipy.spatial import Delaunay
 import os
 import shutil
+import scienceplots
+plt.style.use('science') # more scientific style for matplotlib
+plt.rcParams['text.usetex'] = False # this avoids an annoying latex installation
+
 
 def read_last(file):
     
@@ -23,13 +27,22 @@ def read_last(file):
 
     # Find the LAST occurrence of "ITEM: ATOMS"
     last_idx = None
+    box_idx = None
     for i in range(len(lines) - 1, -1, -1):
-        if lines[i].strip() == "ITEM: ATOMS id type xs ys zs":
+        if last_idx is None and lines[i].strip() == "ITEM: ATOMS id type xs ys zs":
             last_idx = i + 1
+        if box_idx is None and lines[i].startswith("ITEM: BOX BOUNDS"):
+            box_idx = i + 1
+        if last_idx is not None and box_idx is not None:
             break
 
-    if last_idx is None:
-        raise ValueError("No atom data found in dump file")
+    if last_idx is None or box_idx is None:
+        raise ValueError("No atom/box data found in dump file")
+
+    xlength, xhight = map(float, lines[box_idx].split()[:2])
+    #line looks like this -1.4916282000000001e+01 1.4916282000000001e+01
+    Lx = np.abs(xhight - xlength)  # box is square, so this also equals Ly
+
 
     set1 = []
     set2 = []
@@ -41,7 +54,7 @@ def read_last(file):
         y = float(data[3])
         sigma = minsigma + (c - 0.5) * binsize
         set1.append([x, y])
-        set2.append(sigma)
+        set2.append(sigma/ Lx) # we normalise sigma so it fits the coordiantes scale between 0 and 1 from lammps
         i += 1
 
     return np.array(set1, dtype=float), np.array(set2, dtype=float)
@@ -78,7 +91,7 @@ def Number_near_neighbout_delinea(coordinates):
     tri_radii = np.asarray([circumradius(coordinates[t,:]) for t in triangles])
     med_radius = np.median(tri_radii)
     thres *= med_radius
-    print(f"the threashhold for delaunay is = {thres}")
+    #print(f"the threashhold for delaunay is = {thres}")
     triangles = triangles[tri_radii < thres]
     #print(triangles)
 
@@ -144,7 +157,7 @@ def psi_plot(filename="dump.LJ", save_path=None):
     N = len(snap)
 
     psi = psi_six_local_order(angle_input)
-    global_psi = psi_six_global(psi, N)
+    #global_psi = psi_six_global(psi, N)
     x, y = snap[:, 0], snap[:, 1]
 
     mean_sigma = np.mean(COLOUR)
@@ -156,7 +169,7 @@ def psi_plot(filename="dump.LJ", save_path=None):
     X, Y = x[mask], y[mask]
     psi = psi[mask]
     color_inside = COLOUR[mask]
-
+    global_psi = np.mean(np.abs(psi))#global claculated based on the internal sample
     fig, ax = plt.subplots()
 
     cmap = cm.get_cmap('Wistia')
@@ -169,11 +182,14 @@ def psi_plot(filename="dump.LJ", save_path=None):
     ax.set_aspect("equal")
     # add colorbar
     sm = cm.ScalarMappable(norm=norm, cmap=cmap)
-    sm.set_array([np.abs(psi)]) 
-    fig.colorbar(sm, ax=ax, label='Local |psi6|')
-    ax.set_xlabel("position x")
-    ax.set_ylabel("position y")
-    ax.set_title(f"Psi6 global = {global_psi:.3f} (polydispersity {PD:.2f}%)")
+    sm.set_array([]) 
+    cbar = fig.colorbar(sm,ax=ax)
+    cbar.set_label(r"$|\psi_6|$")
+    #fig.colorbar(sm, ax=ax, label='Local |psi6|')
+    ax.set_xticks([])
+    ax.set_yticks([])
+    #ax.text(0.02,0.98,rf"$Global \phi={global_psi:.3f}$"+"\n"+rf"$Polydispersity={PD:.2f}\%$",transform=ax.transAxes,va="top")
+    ax.set_title(rf"$Global" +" "+rf"\phi:{global_psi:.3f}$"+ " "+rf"$Polydispersity:{PD:.2f}\%$")
     
     plt.tight_layout()
     if save_path:
@@ -253,7 +269,7 @@ def organise_and_plot(dump_files=None, output_dir="results"):
 
     for dump_file in dump_files:
         if not os.path.exists(dump_file):
-            print(f"Warning: {dump_file} not found, skipping.")
+            print(f"Note: {dump_file} was skiped.")
             continue
 
         # Generate the psi6 plot BEFORE moving the file
@@ -265,7 +281,7 @@ def organise_and_plot(dump_files=None, output_dir="results"):
         # Move the dump file into the results folder
         dest = os.path.join(output_dir, dump_file)
         shutil.move(dump_file, dest)
-        print(f"Moved {dump_file} -> {dest}")
+        print(f"Moved {dump_file} to {dest}")
 
 def colloidal_distance(coordinates):
 
