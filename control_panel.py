@@ -50,9 +50,9 @@ def main():
     cut_factor = 2 ** (1 / 6) #1.12246
     print(cut_factor)
     #produces equilibriation step 
-    Pair_coeffecients(epsilon=100,sizes=size,filename="pair.polydisperse.equilibration")
+    Pair_coeffecients(epsilon=1,sizes=size,filename="pair.polydisperse.equilibration")
     #Produces production step
-    Pair_coeffecients(sizes=size)
+    Pair_coeffecients(epsilon=100, sizes=size)
     #equilibration for attractive step 
     Pair_coeffecients(sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive.equilibration")
     #attractive step

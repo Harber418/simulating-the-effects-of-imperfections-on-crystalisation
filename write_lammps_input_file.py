@@ -23,6 +23,7 @@ def write_lammps(attraction: bool = True, main_iterations: int = 1000000,
         # equilibration starts here
         f.write("pair_style soft 1.12246152962189\n")
         f.write("include pair.polydisperse.equilibration\n")
+        #fix langevin Tstart Tstop Tdamp seed
         f.write("fix 1 all nve\nfix 2 all langevin 1.0 1.0 1.0 31\nfix 3 all enforce2d\n")
         f.write("thermo 1000\n")
         f.write("thermo_style custom step temp epair press pxx pyy vol\n")

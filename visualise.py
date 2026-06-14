@@ -5,6 +5,8 @@ plot for colour relates to number of nearest neighbours
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+from matplotlib import cm, colors
 from scipy.spatial import Delaunay
 import os
 import shutil
@@ -156,19 +158,81 @@ def psi_plot(filename="dump.LJ", save_path=None):
     color_inside = COLOUR[mask]
 
     fig, ax = plt.subplots()
-    scatter_plot = ax.scatter(X, Y, c=np.abs(psi), marker='o', cmap='Wistia',
-                               s=color_inside*20, vmin=0.3, vmax=0.93)
+
+    cmap = cm.get_cmap('Wistia')
+    norm = colors.Normalize(vmin=0.0, vmax=1.0)
+
+    for xi, yi, sigma_i, psi_i in zip(X, Y, color_inside, psi):
+        color = cmap(norm(np.abs(psi_i)))
+        circ = Circle((xi, yi), radius=sigma_i/2, facecolor=color, edgecolor='k',linewidth=0.1)
+        ax.add_patch(circ)
+    ax.set_aspect("equal")
+    # add colorbar
+    sm = cm.ScalarMappable(norm=norm, cmap=cmap)
+    sm.set_array([np.abs(psi)]) 
+    fig.colorbar(sm, ax=ax, label='Local |psi6|')
     ax.set_xlabel("position x")
     ax.set_ylabel("position y")
     ax.set_title(f"Psi6 global = {global_psi:.3f} (polydispersity {PD:.2f}%)")
-    cbar = fig.colorbar(scatter_plot)
-    cbar.set_label("Local psi 6")
+    
     plt.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=150)
+        plt.close(fig)
+        #colloidal_distance(snap)
+    else:
+        plt.show()
+
+def psi_plot_old(filename="dump.LJ", save_path=None):
+    snap, COLOUR = read_last(filename)
+    nn, cc = Number_near_neighbout_delinea(snap)
+    angle_input = angles_for_NN(snap, nn)
+    N = len(snap)
+
+    psi = psi_six_local_order(angle_input)
+    global_psi = psi_six_global(psi, N)
+    x, y = snap[:, 0], snap[:, 1]
+
+    mean_sigma = np.mean(COLOUR)
+    std_sigma = np.std(COLOUR)
+    PD = 100 * std_sigma / mean_sigma
+
+    b = 0.05
+    mask = (x >= b) & (x <= 1 - b) & (y >= b) & (y <= 1 - b)
+    X, Y = x[mask], y[mask]
+    psi = psi[mask]
+    color_inside = COLOUR[mask]
+
+    fig, ax = plt.subplots()
+    #scatter_plot = ax.scatter(X, Y, c=np.abs(psi), marker='o', cmap='Wistia',
+    #                           s=color_inside*20, vmin=0.3, vmax=0.93)
+    ax.set_xlabel("position x")
+    ax.set_ylabel("position y")
+    ax.set_title(f"Psi6 global = {global_psi:.3f} (polydispersity {PD:.2f}%)")
+    #cbar = fig.colorbar(scatter_plot)
+    #cbar.set_label("Local psi 6")
+    plt.tight_layout()
+    #new plotting 
+    #fig, ax = plt.subplots()
+
+    for x,y,sigma in zip(X,Y,COLOUR):
+        circle = Circle(
+            (x,y),
+            radius=sigma/2,
+            fill=True,
+            c=np.abs(psi),
+            cmap='Wistia'
+        )
+        ax.add_patch(circle)
+
+    ax.set_aspect("equal")
+
+    #
 
     if save_path:
         fig.savefig(save_path, dpi=150)
         plt.close(fig)
-        colloidal_distance(snap)
+        #colloidal_distance(snap)
     else:
         plt.show()
 
