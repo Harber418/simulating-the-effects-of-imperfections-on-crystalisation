@@ -8,6 +8,7 @@ runs the lammps simulation
 saves the required data as a text file 
 produces plots of the psi 6 for each step in the simulation.
 """
+#https://iifx.dev/en/articles/457242272/bridging-the-gap-how-to-make-your-c-matrix-multiplications-as-fast-as-fortran
 import numpy as np 
 import sys
 import argparse

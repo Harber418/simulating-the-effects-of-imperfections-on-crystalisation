@@ -45,6 +45,8 @@ def write_lammps(attraction: bool = True, main_iterations: int = 1000000,
             f.write(f"pair_style lj/cut {cut_off}\n")
             f.write("pair_modify shift no\n")
             f.write("include pair.polydisperse.attractive.equilibration\n")
+            #we want to remove the brownian motion so we set langevin to have a higher drag 
+            #f.write("fix 2 all langevin 1.0 1.0 1.0 31\n")
             f.write(f"timestep {timestep}\nrun 250000\n")
             f.write("write_dump all atom attractive_equil_positions.dump\n")
 
