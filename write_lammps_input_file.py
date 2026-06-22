@@ -42,6 +42,8 @@ def write_lammps(attraction: bool = True, main_iterations: int = 1000000,
 
         if attraction:
             # equilibration for attractive stage
+            f.write("unfix 2\n")
+            #f.write("fix 2 all langevin 1.0 1.0 0.1 31\n")  # Tdamp 0.01 = 100x more drag
             f.write(f"pair_style lj/cut {cut_off}\n")
             f.write("pair_modify shift no\n")
             f.write("include pair.polydisperse.attractive.equilibration\n")
