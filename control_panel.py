@@ -30,7 +30,7 @@ def main():
     parser.add_argument('-I', '--attractive_itterations', type=int, default=100000, help="how long should the attractive production stage be (default: 250000)")
     parser.add_argument('-t', '--timestep', type=float, default=0.01, help="timestep for attractive term, used if forces are too large leading to errors (default: 0.01)")
 
-    args = parser.parse_args()
+    args = parser.parse_args() 
 
 
     #===========================================================================================

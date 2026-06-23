@@ -42,14 +42,15 @@ def write_lammps(attraction: bool = True, main_iterations: int = 1000000,
 
         if attraction:
             # equilibration for attractive stage
-            f.write("unfix 2\n")
-            f.write("fix 2 all langevin 1.0 1.0 0.1 31\n")  # Tdamp 0.01 = 100x more drag
+            #f.write("unfix 2\n")
+            f.write("fix 2 all langevin 1.0 1.0 0.01 31\n")  # Tdamp 0.01 = 100x more drag
             f.write(f"pair_style lj/cut {cut_off}\n")
             f.write("pair_modify shift no\n")
             f.write("include pair.polydisperse.attractive.equilibration\n")
             #we want to remove the brownian motion so we set langevin to have a higher drag 
             #f.write("fix 2 all langevin 1.0 1.0 1.0 31\n")
-            f.write(f"timestep {timestep}\nrun 250000\n")
+            f.write(f"thermo 10000\nthermo_style custom step temp epair press pxx pyy vol\n")
+            f.write(f"timestep {timestep}\nrun 10000\n")
             f.write("write_dump all atom attractive_equil_positions.dump\n")
 
             # attractive stage
