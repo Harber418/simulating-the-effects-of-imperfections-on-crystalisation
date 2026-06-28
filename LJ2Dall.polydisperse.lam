@@ -25,7 +25,7 @@ timestep 0.01
 run 2000000
 write_dump all atom production_positions.dump
 fix 2 all langevin 1.0 1.0 0.01 31
-pair_style lj/cut 1.4963000000000002
+pair_style lj/cut 1.4949999999999999
 pair_modify shift no
 include pair.polydisperse.attractive.equilibration
 thermo 10000
@@ -33,7 +33,7 @@ thermo_style custom step temp epair press pxx pyy vol
 timestep 0.001
 run 10000
 write_dump all atom attractive_equil_positions.dump
-pair_style lj/cut 1.4963000000000002
+pair_style lj/cut 1.4949999999999999
 pair_modify shift no
 include pair.polydisperse.attractive
 thermo 10000
