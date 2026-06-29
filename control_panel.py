@@ -29,7 +29,8 @@ def main():
     parser.add_argument('-i', '--iterations', type=int, default=1500000, help="how long should the production stage be (default: 1000000)")
     parser.add_argument('-I', '--attractive_itterations', type=int, default=100000, help="how long should the attractive production stage be (default: 250000)")
     parser.add_argument('-t', '--timestep', type=float, default=0.01, help="timestep for attractive term, used if forces are too large leading to errors (default: 0.01)")
-
+    parser.add_argument('-s', '--scaled' ,type=bool,default=True, help = "diffenert sized particles attract differently ")
+    parser.add_argument('-v', '--volume' ,type=float,default=32, help = "length of box to shrink to")
     args = parser.parse_args() 
 
 
@@ -55,14 +56,14 @@ def main():
     #Produces production step
     Pair_coeffecients(epsilon=10, sizes=size)
     #equilibration for attractive step 
-    Pair_coeffecients(epsilon=args.epsilon,sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive.equilibration")
+    Pair_coeffecients(epsilon=args.epsilon,sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive.equilibration",scaled=args.scaled)
     #attractive step
-    Pair_coeffecients(epsilon=args.epsilon,sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive")
+    Pair_coeffecients(epsilon=args.epsilon,sizes=size,cut_factor=args.cut_off,filename = "pair.polydisperse.attractive",scaled=args.scaled)
     
     
     #==============================================================================================================================
     #write the lammps file 
-    write_lammps(attraction=args.attractive,main_iterations=args.iterations,attraction_iterations=args.attractive_itterations,cut_off=args.cut_off*1.3,timestep=args.timestep)
+    write_lammps(attraction=args.attractive,main_iterations=args.iterations,attraction_iterations=args.attractive_itterations,cut_off=args.cut_off*1.5,timestep=args.timestep,volume_reduction=args.volume)
     
     #================================================================================================================================
     #run the lammps simulation 

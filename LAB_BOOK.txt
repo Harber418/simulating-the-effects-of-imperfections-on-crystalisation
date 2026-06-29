@@ -1,0 +1,19 @@
+@@@
+lab book for notes and thoughts
+@@@
+
+### 29-6-26
+It looks like  we get good grain boundarys with these parameters 
+8% poly with 32 box size epsilon 10 and cut of of 1.5 or 1.15
+
+but if we take this to higher poly like 14% we need a larger box size so 32.8 was the lowest i found 
+it also looks very amorphous with no be boundarys but this is mayber expected 
+
+I think the only solution it to have a bigger box and slowly reduce the size of the box 
+the minimum will depend on the poly then 
+
+I also want to try to make the attraction scale differntly with particle size
+so parciles of the same shape pull stronger than a big and a small 
+
+at 33 there is just not enough space for the attractive phase do to anything. 
+I tryed adding a but that only lets particles of similar size have attractive qualities but that did not help 

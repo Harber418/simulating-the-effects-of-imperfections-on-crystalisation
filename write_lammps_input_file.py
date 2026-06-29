@@ -2,7 +2,7 @@ import numpy as np
 
 def write_lammps(attraction: bool = True, main_iterations: int = 1000000,
                   attraction_iterations: int = 250000, cut_off: float = 2.6,
-                  timestep: float = 0.01):
+                  timestep: float = 0.01,volume_reduction: float =32,scaled: bool =True):
     """
     bool : do you want attraction?
     int : iterations for main sequence
@@ -40,6 +40,15 @@ def write_lammps(attraction: bool = True, main_iterations: int = 1000000,
         f.write(f"run {main_iterations}\n")
         f.write("write_dump all atom production_positions.dump\n")
 
+        if scaled:
+            f.write(f"variable Lfinal equal {volume_reduction}")
+            f.write("variable Lstart equal 36")
+            f.write("variable nsteps equal 1000000")
+            f.write("fix deform all deform 1 x final 0.0 ${Lfinal} y final 0.0 ${Lfinal} remap x")
+            f.write("run ${nsteps}")
+            f.write("unfix deform")
+            #f.write("run 500000")  # equilibrate at final area fraction
+       
         if attraction:
             # equilibration for attractive stage
             #f.write("unfix 2\n")

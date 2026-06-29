@@ -22,10 +22,10 @@ include pair.polydisperse
 thermo 10000
 thermo_style custom step temp epair press pxx pyy vol
 timestep 0.01
-run 2000000
+run 1000000
 write_dump all atom production_positions.dump
-fix 2 all langevin 1.0 1.0 0.01 31
-pair_style lj/cut 1.9500000000000002
+variable Lfinal equal 32.0variable Lstart equal 36variable nsteps equal 1000000fix deform all deform 1 x final 0.0 ${Lfinal} y final 0.0 ${Lfinal} remap xrun ${nsteps}unfix deformfix 2 all langevin 1.0 1.0 0.01 31
+pair_style lj/cut 2.25
 pair_modify shift no
 include pair.polydisperse.attractive.equilibration
 thermo 10000
@@ -33,11 +33,11 @@ thermo_style custom step temp epair press pxx pyy vol
 timestep 0.001
 run 10000
 write_dump all atom attractive_equil_positions.dump
-pair_style lj/cut 1.9500000000000002
+pair_style lj/cut 2.25
 pair_modify shift no
 include pair.polydisperse.attractive
 thermo 10000
 thermo_style custom step temp epair press pxx pyy vol
 timestep 0.001
-run 10000
+run 20000
 write_dump all atom attractive_positions.dump

@@ -1,12 +1,17 @@
 import numpy as np
 
 # Prepare output lines for LJ/WCA
-def Pair_coeffecients(epsilon=1, ntype=60,sizes=[],cut_factor=(2 ** (1 / 6)),filename = "pair.polydisperse"):
+def Pair_coeffecients(epsilon=1, ntype=60,sizes=[],cut_factor=(2 ** (1 / 6)),filename = "pair.polydisperse",scaled=False):
     pair_lines = []
     for i in range(ntype):
         for j in range(i, ntype):
             sigma = 0.5 * (sizes[i] + sizes[j])
             cutoff = cut_factor * sigma
+            diff = np.abs(i-j)
+            if scaled & diff >3:
+                size_ratio = (2 * min(i, j) / (i + j)) ** 3
+                cutoff = cut_factor + 0.6*size_ratio
+    
             if filename == "pair.polydisperse.equilibration":
                 pair_lines.append(f"pair_coeff {i+1} {j+1} {epsilon:.6f} {cutoff:.6f}")
             else:
